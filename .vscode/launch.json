@@ -1,0 +1,58 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    //   https://code.visualstudio.com/docs/editor/variables-reference
+    "version": "0.2.0",
+    "configurations": [        
+        {
+            "name": "(debug) mingw run",
+            "type": "cppdbg",
+            "request": "launch",
+            "targetArchitecture": "x64",
+            "program": "${workspaceFolder}/${workspaceFolderBasename}.exe",
+            "args": [
+                "drawshape"
+                ,"--shpfile", "shps/area.shp"
+                ,"--outpng", "output/area.png"
+                ,"--style", "file:///output/area.css"
+            ],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "${env:MINGW64_ROOT_BASH}/bin/gdb.exe",
+            "preLaunchTask": "mingw64 debug",
+            "setupCommands": [
+                {
+                    "description": "enable pretty printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+		{
+            "name": "(debug) linux run",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/${workspaceFolderBasename}",
+            "targetArchitecture": "x64",
+            "args": [],
+            "stopAtEntry": true,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "preLaunchTask": "linux64 debug",
+            "setupCommands": [
+                {
+                    "description": "enable pretty printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

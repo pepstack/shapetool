@@ -1,0 +1,39 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "windowsSdkVersion": "10.0.18362.0",
+            "compilerPath": "${env:MSYS2_HOME}/mingw64/bin/gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "includePath": [
+				"${env:MSYS2_HOME}/mingw64/include",
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/deps/shapefile/**"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+				"__MINGW64__"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        },
+        {
+            "name": "Linux",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "includePath": [
+                "/usr/include",
+                "/usr/local/include",
+                "${workspaceFolder}/src/**"
+            ],
+            "defines": [
+                "_DEBUG"
+            ],
+            "intelliSenseMode": "gcc-x64"
+        }
+    ],
+    "version": 4
+}

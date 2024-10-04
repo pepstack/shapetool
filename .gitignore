@@ -50,3 +50,7 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# SHAPETOOL IGNORED DIRS AND FILES
+deps/
+output/

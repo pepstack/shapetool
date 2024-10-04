@@ -1,0 +1,54 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "mingw64 debug",
+			"type": "shell",
+			"command": "${env:VULKAN_DEV_ROOT_BASH}/Samples/${workspaceFolderBasename}/make-debug-x86_64.sh",
+			"args": [],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "linux64 debug",
+			"type": "shell",
+			"command": "${workspaceFolder}/make-debug-x86_64.sh",
+			"args": [],
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		},
+		{
+			"label": "Task: test vars",
+			"type": "shell",
+			"command": "echo",
+			"args": [
+				"${env:VULKAN_DEV_ROOT_BASH}/Samples/${workspaceFolderBasename}"
+			],
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			},
+			"options": {
+				"cwd": "${workspaceFolder}"
+			}
+		}
+	]
+}

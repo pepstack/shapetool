@@ -1,0 +1,45 @@
+{
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "window.zoomLevel": 1,
+    "git.ignoreLegacyWarning": true,
+    "editor.formatOnSave": false,
+    "terminal.integrated.profiles.windows": {
+        "msys2": {
+            "path": [
+                "${env:MINGW64_ROOT}\\usr\\bin\\bash.exe"
+            ],
+            "icon": "terminal-bash",
+            "args": [
+                "--login",
+                "-i"
+            ],
+            "env": {
+                "MSYSTEM": "MINGW64",
+                "CHERE_INVOKING": "1",
+                "CONTITLE": "MinGW x64",
+                "C_INCLUDE_PATH": "/mingw64/include",
+                "CPLUS_INCLUDE_PATH": "/mingw64/include",
+
+                // THE FOLLOWING IS A HACK TO PLACE THE MSYS PATHS BEFORE THE WINDOWS ONES
+                "PATH": "/usr/bin;/mingw64/bin;${env:PATH}"
+            }
+        }
+    },
+    "terminal.integrated.defaultProfile.windows": "Git Bash",
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "array": "c",
+        "compare": "c",
+        "functional": "c",
+        "ostream": "c",
+        "ranges": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "string": "c",
+        "string_view": "c",
+        "random": "c"
+    }
+}
