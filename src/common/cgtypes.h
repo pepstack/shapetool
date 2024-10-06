@@ -59,6 +59,13 @@ typedef struct
 
 typedef struct
 {
+    double W;   // Width
+    double H;   // Height
+} CGSize2D;
+
+
+typedef struct
+{
     union {
         struct {
             double Xmin;
@@ -109,7 +116,7 @@ typedef struct
 
 #define CGBoxIsOverlap(a, b)   ((a).Xmin<(b).Xmax && (a).Ymin<(b).Ymax && (b).Xmin<(a).Xmax && (b).Ymin<(a).Ymax)
 
-
+#define CGBoxInflate(box, d)   do { box.Xmin -= d; box.Ymin -= d; box.Xmax += d; box.Ymax += d; } while(0)
 
 #ifdef __cplusplus
 }

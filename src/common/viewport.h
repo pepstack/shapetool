@@ -27,7 +27,7 @@
  *
  * @version    1.0.0
  * @create     2005-09-30
- * @date       2024-10-03
+ * @date       2024-10-06
  * 
  *     ^          data       Xmax,Ymax
  *  dY |-------------------------+
@@ -58,6 +58,7 @@ extern "C"
 #endif
 
 #include "cgtypes.h"
+#include "basetype.h"
 
 
 typedef struct
@@ -69,8 +70,7 @@ typedef struct
     CGPoint2D viewCP;      // center point of view extent
 
     double  Xdpi;          // dot per inch in X direction
-    double  Ydpi;          // dot per inch in Y direction
-    double  dpiRatio;      // Xdpi/Ydpi
+    double  dpiRatio;      // dpiRatio = Ydpi / Xdpi; Ydpi = Xdpi * dpiRatio
 
     // current X scale: viewPortDX/visibleDataDX  (likes: pixels/meter)
     double  XScale;
@@ -111,19 +111,17 @@ static double ViewportCalcScale (Viewport2D *vp)
 /**
  * @brief init all members of Viewport2D
  */
-static void ViewportInitAll(Viewport2D *vp, CGBox2D dataBox, CGBox2D viewBox, double scalePrecision, int Xdpi, int Ydpi)
+static void ViewportInitAll(Viewport2D *vp, CGBox2D dataBox, CGBox2D viewBox, CGSize2D viewDPI, double dataPrecision)
 {
+    // 扩充数据范围以避免无数据溢出
+    // dataPrecision 必须 > DBL_EPSILON
+    CGBoxInflate(dataBox, dataPrecision);
+
     vp->dataBox = dataBox;
     vp->viewBox = viewBox;
 
-    vp->Xdpi = (double) Xdpi;
-    if (Ydpi) {
-        vp->Ydpi = (double) Ydpi;
-    } else {
-        vp->Ydpi = vp->Xdpi;
-    }
-
-    vp->dpiRatio = vp->Xdpi / vp->Ydpi;
+    vp->dpiRatio = viewDPI.H / viewDPI.W;
+    vp->Xdpi = viewDPI.W;
 
     vp->dataCP.X = (vp->dataBox.Xmin + vp->dataBox.Xmax) * 0.5;
     vp->dataCP.Y = (vp->dataBox.Ymin + vp->dataBox.Ymax) * 0.5;
@@ -139,7 +137,7 @@ static void ViewportInitAll(Viewport2D *vp, CGBox2D dataBox, CGBox2D viewBox, do
 
     // viewPrecision: 对应视口大小的数据坐标最小距离(精度)
     vp->MinScale = sqrt((vx * vx + vy * vy) / (dx * dx + dy * dy)) / 2;
-    vp->MaxScale = sqrt((vx * vx + vy * vy) / (scalePrecision * scalePrecision)) * 2;
+    vp->MaxScale = sqrt((vx * vx + vy * vy) / (dataPrecision * dataPrecision)) * 2;
 
     ViewportSetScale(vp, ViewportCalcScale(vp));
 }
@@ -216,8 +214,8 @@ static CGPoint2D ViewportGetRatio(const Viewport2D *vp)
  **********************************************************/
 STATIC_INLINE void ViewToDataPoint(const Viewport2D *vp, const CGPoint2D *view, CGPoint2D *data)
 {
-    data->X = vp->dataCP.X + (view->X - vp->viewCP.X) / vp->XScale;
-    data->Y = vp->dataCP.Y + (vp->viewCP.Y - view->Y * vp->dpiRatio) / vp->XScale;
+   data->X = vp->dataCP.X + (view->X - vp->viewCP.X) / vp->XScale;
+   data->Y = vp->dataCP.Y + (vp->viewCP.Y - view->Y / vp->dpiRatio) / vp->XScale;
 }
 
 
@@ -255,13 +253,13 @@ STATIC_INLINE void ViewToDataBox(const Viewport2D *vp, CGBox2D view, CGBox2D *da
 STATIC_INLINE void DataToViewXY(const Viewport2D *vp, double Dx, double Dy, double *Vx, double *Vy)
 {
     *Vx = vp->viewCP.X + vp->XScale * (Dx - vp->dataCP.X);
-    *Vy = (vp->viewCP.Y - vp->XScale * (Dy - vp->dataCP.Y)) / vp->dpiRatio;
+    *Vy = (vp->viewCP.Y - vp->XScale * (Dy - vp->dataCP.Y)) * vp->dpiRatio;
 }
 
 STATIC_INLINE void DataToViewPoint(const Viewport2D *vp, const CGPoint2D *data, CGPoint2D *view)
 {
     view->X = vp->viewCP.X + vp->XScale * (data->X - vp->dataCP.X);
-    view->Y = (vp->viewCP.Y - vp->XScale * (data->Y - vp->dataCP.Y)) / vp->dpiRatio;
+    view->Y = (vp->viewCP.Y - vp->XScale * (data->Y - vp->dataCP.Y)) * vp->dpiRatio;
 }
 
 static void DataToViewPoints(const Viewport2D *vp, const CGPoint2D *datas, CGPoint2D *views, int count)

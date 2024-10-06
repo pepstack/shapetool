@@ -38,17 +38,18 @@ extern "C" {
 
 #include <getopt.h>
 
-// css parser
-// https://blog.csdn.net/weixin_41036447/article/details/113731281
-#include <katana.h>
+#include "cairodrawctx.h"
 
-#include "common/cstrbuf.h"
 
 #ifdef __LINUX__
 # define AAAA
 #else
 # define AAAA
 #endif
+
+#define SHAPETOOL_NAME_MAXLEN    30
+#define SHAPETOOL_PATH_MAXLEN   255
+
 
 #define SHAPETOOL_OPT_DRAWSHP    1
 #define SHAPETOOL_OPT_SHPFILE    2
@@ -57,7 +58,8 @@ extern "C" {
 #define SHAPETOOL_OPT_HEIGHT     5      // height in dots
 #define SHAPETOOL_OPT_DPI        6      // dots per inch
 
-#define SHAPETOOL_OPT_STYLE      7      // css style string of file (file:///path/to/style.css)
+#define SHAPETOOL_OPT_STYLECLASS 7      // style class names
+#define SHAPETOOL_OPT_STYLECSS   8      // style css file (/path/to/style.css)
 
 
 typedef struct
@@ -67,7 +69,8 @@ typedef struct
     unsigned int width: 1;
     unsigned int height: 1;
     unsigned int dpi: 1;
-    unsigned int style: 1;
+    unsigned int styleclass: 1;
+    unsigned int stylecss: 1;
 } shapetool_flags;
 
 
@@ -75,7 +78,9 @@ typedef struct
 {
     cstrbuf shpfile;
     cstrbuf outpng;
-    cstrbuf style;
+
+    cstrbuf styleclass;  // style class names
+    cstrbuf stylecss;    // style css file (/path/to/style.css)
 
     float   width;      // width in dots
     float   height;     // height in dots

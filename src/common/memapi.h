@@ -30,7 +30,7 @@
  * @author     Liang Zhang <350137278@qq.com>
  * @version    0.0.10
  * @create     2018-10-25 09:09:10
- * @update     2021-06-18 17:27:33
+ * @update     2024-10-06 13:30:33
  */
 #ifndef MEMAPI_H_INCLUDED
 #define MEMAPI_H_INCLUDED
@@ -164,11 +164,26 @@ STATIC_INLINE char * mem_strdup (const char *s)
 {
     if (s) {
         size_t sz = strlen(s) + sizeof(char);
-        char * d = (char *) mem_alloc_unset(sz);
-        memcpy(d, s, sz);
-        return d;
+        char * dst = (char *) mem_alloc_unset(sz);
+        memcpy(dst, s, sz);
+        return dst;
     }
     return 0;
+}
+
+
+STATIC_INLINE char * mem_strdup_len (const char *s, int len)
+{
+    char *dst = 0;
+    if (len < 0) {
+        len = (s? strlen(s) : 0);
+    }
+    dst = (char *) mem_alloc_unset(len + sizeof(char));
+    if (len > 0) {
+        memcpy(dst, s, len);
+    }
+    dst[len] = '\0';
+    return dst;
 }
 
 

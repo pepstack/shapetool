@@ -31,8 +31,6 @@
 extern "C" {
 #endif
 
-#include <common/viewport.h>
-
 // Build libshapefile.so:
 //  $ cd deps/
 //  $ git clone https://github.com/pepstack/shapefile
@@ -40,25 +38,8 @@ extern "C" {
 //  $ make
 #include <shapefile/shapefile_api.h>
 
-/**
- * cairo 2D draw api
- */
-#include <cairo/cairo.h>
-#include <cairo/cairo-features.h>
-#include <cairo/cairo-svg.h>
-#include <cairo/cairo-pdf.h>
-#include <cairo/cairo-ps.h>
-#include <cairo/cairo-version.h>
-#include <cairo/cairo-win32.h>
-
-
-typedef struct
-{
-    cairo_surface_t *surface;
-    cairo_t *cr;
-
-    Viewport2D viewport;
-} cairoDrawCtx;
+// draw context
+#include "cairodrawctx.h"
 
 
 typedef struct
@@ -121,58 +102,7 @@ static int shapeFileInfoOpen(shapeFileInfo *shpInfo, const char *shapefile)
 }
 
 
-static int cairoDrawCtxInit(cairoDrawCtx *cdc, double minBounds[], double maxBounds[], int width, int length, int dpi)
-{
-    CGBox2D viewBox = {
-        .Xmin = 0,
-        .Ymin = 0,
-        .Xmax = width,
-        .Ymax = length
-    };
-    CGBox2D dataBox = {
-        .Xmin = minBounds[0],
-        .Ymin = minBounds[1],
-        .Xmax = maxBounds[0],
-        .Ymax = maxBounds[1]
-    };
-
-    cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, length);
-    if (! surface) {
-        printf("Error: cairo_image_surface_create()\n");
-        return -1;
-    }
-
-    cdc->cr = cairo_create(surface);
-    if (! cdc->cr) {
-        printf("Error: cairo_create()\n");
-        return -1;
-    }
-    cdc->surface = surface;
-
-    ViewportInitAll(&cdc->viewport, dataBox, viewBox, 1.0, dpi, 0);
-
-    return 0;
-}
-
-
-static void cairoDrawCtxFinal(cairoDrawCtx *cdc)
-{
-    cairo_surface_t *surface = cdc->surface;
-    cairo_t *cr = cdc->cr;
-
-    cdc->surface = 0;
-    cdc->cr = 0;
-
-    if (cr) {
-        cairo_destroy(cr);
-    }
-    if (surface) {
-        cairo_surface_destroy(surface);
-    }
-}
-
-
-static void shapeFileInfoDraw(shapeFileInfo *shpInfo, cairoDrawCtx *cdc, KatanaOutput *styleCSS)
+static void shapeFileInfoDraw(shapeFileInfo *shpInfo, cairoDrawCtx *CDC)
 {
     int nShapeId;
 
@@ -187,23 +117,19 @@ static void shapeFileInfoDraw(shapeFileInfo *shpInfo, cairoDrawCtx *cdc, KatanaO
 
     int nShpTypeMask = shpInfo->nShpTypeMask;
 
-    if (styleCSS) {
-        KatanaStylesheet *sheet = styleCSS->stylesheet;
-    }
-
     for (nShapeId = 0; nShapeId < shpInfo->nEntities; nShapeId++) {
         // read bounding rect of shape
         if (SHPReadObjectEnvelope(shpInfo->hSHP, nShapeId, (SHPEnvelope *) &shapeEnv, 0) != SHPT_NULL) {
             // convert to canvas box 
-            DataToViewBox(&cdc->viewport, shapeEnv, &drawRect);
+            DataToViewBox(&CDC->viewport, shapeEnv, &drawRect);
 
             // test if overlapped of canvas with shape
-            if (CGBoxIsOverlap(cdc->viewport.viewBox, drawRect)) {
+            if (CGBoxIsOverlap(CDC->viewport.viewBox, drawRect)) {
                 if (nShpTypeMask == SHAPE_TYPE_POLYGON) {
                     if (CGBoxGetDX(drawRect) > 0 && CGBoxGetDY(drawRect) > 0) {
                         // polygon shape is visible
                         if (SHPReadObjectEx(shpInfo->hSHP, nShapeId, shapeReadRef)) {
-                            drawPolygonShape(shapeReadRef, cdc);
+                            drawPolygonShape(shapeReadRef, CDC);
                         } else {
                             printf("Warn: SHPReadObjectEx() failed on shape#%d\n", nShapeId);
                         }
@@ -230,6 +156,8 @@ void drawPolygonShape(const SHPObjectEx *hShpRef, cairoDrawCtx *cdc)
 
     cairo_t *cr = cdc->cr;
     Viewport2D *vwp = &(cdc->viewport);
+
+    CssPolygonStyle * polygon = &cdc->polygonStyle;
 
     cairo_save(cr);
 
@@ -282,10 +210,10 @@ void drawPolygonShape(const SHPObjectEx *hShpRef, cairoDrawCtx *cdc)
 
     if (part) {
         // success returns 0
-        cairo_set_source_rgb(cr, 0, 128, 0);
+        cairo_set_source_rgb(cr, polygon->fill_color.red, polygon->fill_color.green, polygon->fill_color.blue);
         cairo_fill_preserve(cr);
 
-        cairo_set_source_rgb(cr, 128, 0, 128);
+        cairo_set_source_rgb(cr, polygon->border_color.red, polygon->border_color.green, polygon->border_color.blue);
         cairo_stroke(cr);
     }
     else {

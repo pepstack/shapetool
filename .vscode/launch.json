@@ -13,9 +13,12 @@
             "program": "${workspaceFolder}/${workspaceFolderBasename}.exe",
             "args": [
                 "drawshape"
-                ,"--shpfile", "shps/area.shp"
-                ,"--outpng", "output/area.png"
-                ,"--style", "file:///output/area.css"
+                ,"--shpfile", "${workspaceFolder}/shps/area.shp"
+                ,"--outpng", "${workspaceFolder}/output/area.png"
+                ,"--width", "1600"
+                ,"--height", "900"
+                //,"--style-class", "polygon"
+                //,"--style-css", "${workspaceFolder}/shps/area.css"
             ],
             "stopAtEntry": true,
             "cwd": "${workspaceFolder}",

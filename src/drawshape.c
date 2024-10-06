@@ -20,7 +20,7 @@ int shpfile2png(const shapetool_options *options)
     shapeFileInfo shpInfo;
     cairoDrawCtx CDC;
     cairo_status_t status;
-    KatanaOutput * styleCSS = 0;
+    CssClassGroup styleClasses;
 
     if (! options->shpfile) {
         return -1;
@@ -29,44 +29,68 @@ int shpfile2png(const shapetool_options *options)
         return -1;
     }
 
-    if (options->style) {
-        if (cstr_startwith(options->style->str, options->style->len, "file://", 7)) {
-            FILE *fp = fopen(&options->style->str[7], "r");
-            if (! fp) {
-                printf("Error: Cannot open file: %s\n", options->style->str);
-                return -1;
-            }
-            styleCSS = katana_parse_in(fp);
-            fclose(fp);
-        } else {
-            styleCSS = katana_parse(options->style->str, options->style->len, KatanaParserModeStylesheet);
-        }
-    }
-
     printf("Info: %s: %s => %s\n", __FUNCTION__, cstrbufGetStr(options->shpfile), cstrbufGetStr(options->outpng));
 
     // load shp file
-    if (shapeFileInfoOpen(&shpInfo, "C:/WORKSPACE/vulkan-dev/Samples/shapetool/shps/area.shp") != 0) {
-        katana_destroy_output(styleCSS);
+    if (shapeFileInfoOpen(&shpInfo, cstrbufGetStr(options->shpfile)) != 0) {
         return -1;
     }
 
-    // create cairo canvas
-    if (cairoDrawCtxInit(&CDC, shpInfo.minBounds, shpInfo.maxBounds,
-        options->width, options->height, options->dpi) == -1) {
+/*
+    styleClasses.classnum =
+        cstr_split_multi_chrs(cstrbufGetStr(options->styleclass), cstrbufGetLen(options->styleclass),
+            ",;", 2,
+            styleClasses.classes, styleClasses.namelens,
+            sizeof(styleClasses.classes)/sizeof(styleClasses.classes[0]));
+
+    if (styleClasses.classnum == 0)
+        // set default class
+        if (shpInfo.nShpTypeMask == SHAPE_TYPE_POLYGON) {
+            styleClasses.classes[0] = mem_strdup_len("polygon", 7);
+            styleClasses.namelens[0] = 7;
+        } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_LINE) {
+            styleClasses.classes[0] = mem_strdup_len("line", 4);
+            styleClasses.namelens[0] = 4;
+        } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_POINT) {
+            styleClasses.classes[0] = mem_strdup_len("point", 5);
+            styleClasses.namelens[0] = 5;
+        } else {
+            styleClasses.classes[0] = mem_strdup_len("*", 1);
+            styleClasses.namelens[0] = 1;
+        }
+        styleClasses.classnum++;
+    }
+
+    ParseCssStyle(cstrbufGetStr(options->style_cssfile), &styleClasses);
+*/
+
+    // create cairo draw context
+    CGBox2D dataBox = {
+        .Xmin = shpInfo.minBounds[0],
+        .Ymin = shpInfo.minBounds[1],
+        .Xmax = shpInfo.maxBounds[0],
+        .Ymax = shpInfo.maxBounds[1]
+    };
+    CGSize2D viewSize = {
+        .W = options->width,
+        .H = options->height
+    };
+
+    if (cairoDrawCtxInit(&CDC, dataBox, viewSize, dot_logical_px, options->dpi)) {
         shapeFileInfoClose(&shpInfo);
-        katana_destroy_output(styleCSS);
+        // katana_destroy_output(cssStyle);
         return -1;
     }
 
     // draw shapes onto canvas
-    shapeFileInfoDraw(&shpInfo, &CDC, styleCSS);
+    shapeFileInfoDraw(&shpInfo, &CDC);
 
-    katana_destroy_output(styleCSS);
+    //katana_destroy_output(cssStyle);
 
-    status = cairo_surface_write_to_png(CDC.surface, cstrbufGetStr(options->outpng));
+    status = cairoDrawOutputPng(&CDC, 0, cstrbufGetStr(options->outpng));
 
     cairoDrawCtxFinal(&CDC);
+
     shapeFileInfoClose(&shpInfo);
 
     return status;

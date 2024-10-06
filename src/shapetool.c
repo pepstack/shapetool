@@ -21,7 +21,8 @@ static void onexit_cleanup(void)
 {
     cstrbufFree(&options.shpfile);
     cstrbufFree(&options.outpng);
-    cstrbufFree(&options.style);
+    cstrbufFree(&options.styleclass);
+    cstrbufFree(&options.stylecss);
 
     printf("shapetool exit.\n");
 }
@@ -67,7 +68,8 @@ int main(int argc, char * argv[])
         ,{"width", required_argument, &flag, SHAPETOOL_OPT_WIDTH}
         ,{"height", required_argument, &flag, SHAPETOOL_OPT_HEIGHT}
         ,{"dpi", required_argument, &flag, SHAPETOOL_OPT_DPI}
-        ,{"style", required_argument, &flag, SHAPETOOL_OPT_STYLE}
+        ,{"style-class", required_argument, &flag, SHAPETOOL_OPT_STYLECLASS}
+        ,{"style-css", required_argument, &flag, SHAPETOOL_OPT_STYLECSS}
         ,{0, 0, 0, 0}
     };
 
@@ -102,7 +104,7 @@ int main(int argc, char * argv[])
     while ((opt = getopt_long_only(argc, argv, "hV", longopts, &optindex)) != -1) {
         switch (opt) {
         case '?':
-            fprintf(stderr, "Error: option not defined\n");
+            printf("Error: option not defined\n");
             exit(1);
             break;
         case 'h':
@@ -116,10 +118,12 @@ int main(int argc, char * argv[])
             case SHAPETOOL_OPT_SHPFILE:
                 flags.shpfile = 1;
                 options.shpfile = cstrbufDup(options.shpfile, optarg, cstrbuf_error_size_len);
+                cstr_replace_chr(options.shpfile->str, '\\', '/');
                 break;
             case SHAPETOOL_OPT_OUTPNG:
                 flags.outpng = 1;
                 options.outpng = cstrbufDup(options.outpng, optarg, cstrbuf_error_size_len);
+                cstr_replace_chr(options.outpng->str, '\\', '/');
                 break;
             case SHAPETOOL_OPT_WIDTH:
                 flags.width = 1;
@@ -133,9 +137,14 @@ int main(int argc, char * argv[])
                 flags.dpi = 1;
                 options.dpi = atoi(optarg);
                 break;
-            case SHAPETOOL_OPT_STYLE:
-                flags.style = 1;
-                options.style = cstrbufDup(options.style, optarg, cstrbuf_error_size_len);
+            case SHAPETOOL_OPT_STYLECLASS:
+                flags.styleclass = 1;
+                options.styleclass = cstrbufDup(options.styleclass, optarg, cstrbuf_error_size_len);
+                break;
+            case SHAPETOOL_OPT_STYLECSS:
+                flags.stylecss = 1;
+                options.stylecss = cstrbufDup(options.stylecss, optarg, cstrbuf_error_size_len);
+                cstr_replace_chr(options.stylecss->str, '\\', '/');
                 break;
             }
             break;
@@ -144,16 +153,41 @@ int main(int argc, char * argv[])
 
     // default settings for view canvas
     if (! flags.width) {
-        // TODO: get screen width dots
-        options.width = 3840;
+        options.width = CAIRO_DRAW_WIDTH_DEFAULT;
     }
     if (! flags.height) {
-        // TODO: get screen height dots
-        options.height = 2160;
+        options.height = CAIRO_DRAW_HEIGHT_DEFAULT;
     }
+    if (options.width < 10 || options.width > CAIRO_DRAW_WIDTH_MAX) {
+        printf("Error: invalid map width=%.0f\n", options.width);
+        exit(1);
+    }
+    if (options.height < 10 || options.height > CAIRO_DRAW_HEIGHT_MAX) {
+        printf("Error: invalid map height=%.0f\n", options.height);
+        exit(1);
+    }
+
+    // check and vlidate DPI
     if (! flags.dpi) {
-        // TODO: get screen device dpi
-        options.dpi = 96;
+        options.dpi = dpi_high_display;
+    }
+    if (options.dpi < dpi_draft_display) {
+        options.dpi = dpi_draft_display;
+    } else if (options.dpi > dpi_high_print) {
+        options.dpi = dpi_high_print;
+    }
+
+    printf("Info: width=%.0f, height=%.0f, dpi=%d\n", options.width, options.height, options.dpi);
+
+    if (! flags.stylecss) {
+        // If both style css file not given:
+        //   set 'a.shp' with default style css file: 'a.css'
+        printf("%s\n", options.shpfile->str);
+        options.stylecss = cstrbufDup(options.stylecss, options.shpfile->str,  options.shpfile->len);
+        options.stylecss->str[options.stylecss->len - 3] = 'c';
+        options.stylecss->str[options.stylecss->len - 2] = 's';
+        options.stylecss->str[options.stylecss->len - 1] = 's';
+        printf("Info: use default style css: %s\n", options.stylecss->str);
     }
 
     switch(command) {
