@@ -46,8 +46,6 @@ int shpfile2png(shapetool_options *options)
                 options->styleclass = cstrbufDup(options->styleclass, ".point", 6);
             }
         }
-
-        CssParseDrawStyle(cstrbufGetStr(options->stylecss), cstrbufGetStr(options->styleclass));
     }
 
     // create cairo draw context
@@ -67,10 +65,13 @@ int shpfile2png(shapetool_options *options)
         return -1;
     }
 
-    // draw shapes onto canvas
+    // parse css file and config draw style
+    cairoDrawCtxSetCssStyle(&CDC, cstrbufGetStr(options->stylecss), cstrbufGetStr(options->styleclass));
+
+    // draw shapes onto cairo
     shapeFileInfoDraw(&shpInfo, &CDC);
 
-    status = cairoDrawOutputPng(&CDC, 0, cstrbufGetStr(options->outpng));
+    status = cairoDrawCtxOutputPng(&CDC, 0, cstrbufGetStr(options->outpng));
 
     cairoDrawCtxFinal(&CDC);
 

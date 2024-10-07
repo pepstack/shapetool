@@ -157,7 +157,7 @@ void drawPolygonShape(const SHPObjectEx *hShpRef, cairoDrawCtx *cdc)
     cairo_t *cr = cdc->cr;
     Viewport2D *vwp = &(cdc->viewport);
 
-    CssPolygonStyle * polygon = &cdc->polygonStyle;
+    ///CssPolygonStyle * polygon = &cdc->polygonStyle;
 
     cairo_save(cr);
 
@@ -210,10 +210,12 @@ void drawPolygonShape(const SHPObjectEx *hShpRef, cairoDrawCtx *cdc)
 
     if (part) {
         // success returns 0
-        cairo_set_source_rgb(cr, polygon->fill_color.red, polygon->fill_color.green, polygon->fill_color.blue);
+        /// cairo_set_source_rgb(cr, polygon->fill_color.red, polygon->fill_color.green, polygon->fill_color.blue);
+        cairo_set_source_rgb(cr, 128, 0, 128);
         cairo_fill_preserve(cr);
 
-        cairo_set_source_rgb(cr, polygon->border_color.red, polygon->border_color.green, polygon->border_color.blue);
+        ///cairo_set_source_rgb(cr, polygon->border_color.red, polygon->border_color.green, polygon->border_color.blue);
+        cairo_set_source_rgb(cr, 0, 160, 35);
         cairo_stroke(cr);
     }
     else {

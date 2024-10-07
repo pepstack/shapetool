@@ -85,10 +85,12 @@ typedef struct
     cairo_surface_t *surface;
     cairo_t *cr;
 
-    CssPolygonStyle  polygonStyle;
+    ///CssPolygonStyle  polygonStyle;
 
     // paint viewport
     Viewport2D viewport;
+
+    CssDrawStyle drawStyles;
 } cairoDrawCtx;
 
 
@@ -120,8 +122,8 @@ static int cairoDrawCtxInit(cairoDrawCtx *CDC, CGBox2D dataBox, CGSize2D drawSiz
     ViewportInitAll(&CDC->viewport, dataBox, viewBox, viewDPI, 1.0f);
 
     // TODO:
-    CDC->polygonStyle.border_color.red = 128;
-    CDC->polygonStyle.fill_color.blue = 128;
+    ///CDC->polygonStyle.border_color.red = 128;
+    ///CDC->polygonStyle.fill_color.blue = 128;
 
     return 0;
 }
@@ -144,7 +146,43 @@ static void cairoDrawCtxFinal(cairoDrawCtx *CDC)
 }
 
 
-static cairo_status_t cairoDrawOutputPng(cairoDrawCtx *CDC, const CGBox2D *viewBoxOutput, const char * outputPngFile)
+static void cairoDrawCtxSetCssStyle(cairoDrawCtx *CDC, const char *cssFile, const char *cssClass)
+{
+    FILE * fp = fopen(cssFile, "r");
+    if (! fp) {
+        printf("Warn: invalid css file: %s\n", cssFile);
+        return;
+    }
+
+    CssString cssString = 0;
+    int numKeys = 0;
+    CssKeyArray cssOutKeys = 0;
+
+    // 测试空间以分配内存
+    cssString = CssParseFile(fp, 0, &numKeys);
+    fclose(fp);
+
+    if (cssString && numKeys < 0) {
+        numKeys = -numKeys;
+        cssOutKeys = CssKeyArrayNew(numKeys);
+
+        if (CssParseString(cssString, cssOutKeys, &numKeys) && numKeys > 0) {
+            // 使用 cssOutKeys
+            CssPrintKeys(cssString, cssOutKeys, numKeys);
+
+            // TODO: 设置 DrawStyle
+            // ...styleClass
+
+
+        }
+
+        CssKeyArrayFree(cssOutKeys);
+    }
+    CssStringFree(cssString);
+}
+
+
+static cairo_status_t cairoDrawCtxOutputPng(cairoDrawCtx *CDC, const CGBox2D *viewBoxOutput, const char * outputPngFile)
 {
     cairo_status_t status = CAIRO_STATUS_LAST_STATUS;
 

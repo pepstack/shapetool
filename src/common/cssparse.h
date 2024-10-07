@@ -105,6 +105,7 @@ extern "C"
 #endif
 
 typedef char * CssString;
+typedef struct CssKeyField * CssKeyArray;
 
 typedef enum {
     css_type_null = 0,
@@ -116,22 +117,21 @@ typedef enum {
 } CssKeyType;
 
 
-struct CssKeyField {
-    unsigned int offset: 18;
-    unsigned int length: 10;
-    unsigned int type: 4;
-};
+extern CssKeyArray CssKeyArrayNew(int num);
 
+extern void CssKeyArrayFree(CssKeyArray keys);
 
-extern char * CssParseString(char *cssString, struct CssKeyField *outKeys, int *numKeys);
+extern char * CssParseString(char *cssString, CssKeyArray outKeys, int *numKeys);
 
-extern CssString CssParseFile(FILE *cssFile, struct CssKeyField *outKeys, int *numKeys);
+extern CssString CssParseFile(FILE *cssFile, CssKeyArray outKeys, int *numKeys);
 
 // CssString 类型释放器, 仅仅用于释放 CssParseFile() 返回的对象
 extern void CssStringFree(CssString cssString);
 
-// 这个方法展示了如何使用 cssparse 解析输出 css
-extern void CssPrintKeys(const CssString cssString, const struct CssKeyField *cssKeys, int numKeys);
+// 方法展示了如何使用 cssparse 解析输出 css
+///extern int CssKeysFindFirst(const CssString cssString, const CssKeyArray cssKeys, int numKeys);
+
+extern void CssPrintKeys(const CssString cssString, const CssKeyArray cssKeys, int numKeys);
 
 #ifdef __cplusplus
 }

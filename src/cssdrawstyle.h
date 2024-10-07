@@ -75,38 +75,8 @@ typedef struct
     int fill_opacity;    // 0-100
     CssFillStyle fill_style;
     CssColorRGB fill_color;
-} CssPolygonStyle;
+} CssDrawStyle;
 
-
-static void CssParseDrawStyle(const char *cssFile, const char *styleClass)
-{
-    FILE * fp = fopen(cssFile, "r");
-    if (fp) {
-        CssString cssString = 0;
-        int numKeys = 0;
-        void *cssOutKeys = 0;
-
-        // 测试空间以分配内存
-        cssString = CssParseFile(fp, 0, &numKeys);
-        if (cssString && numKeys < 0) {
-            numKeys = -numKeys;
-            cssOutKeys = malloc(sizeof(struct CssKeyField) * numKeys);
-
-            if (CssParseString(cssString, (struct CssKeyField *) cssOutKeys, &numKeys) && numKeys > 0) {
-                // 使用 cssOutKeys
-                CssPrintKeys(cssString, (struct CssKeyField *) cssOutKeys, numKeys);
-
-                // TODO: 设置 DrawStyle
-                // ...styleClass
-
-
-            }
-
-            free(cssOutKeys);
-        }
-        CssStringFree(cssString);
-    }
-}
 
 #ifdef  __cplusplus
 }

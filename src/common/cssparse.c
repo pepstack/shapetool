@@ -37,16 +37,22 @@
 #include "cssparse.h"
 #include "smallregex.h"
 
-static const char CssClassPrefix[] = {0, '.', '#', '*', 0};
-
 #define CSS_STRING_MAXSIZE   0x3FFFF
-#define CSS_KEY_MAXSIZE      0x0400
+#define CSS_KEYVAL_MAXSIZE      0xFF
 
 #ifdef _DEBUG
 #   define DEBUG_ASSERT(cond)  assert((cond));
 #else
 #   define DEBUG_ASSERT(cond)  ;
 #endif
+
+
+struct CssKeyField {
+    unsigned int flag:    2;
+    unsigned int type:    4;
+    unsigned int offset: 18;
+    unsigned int length:  8;
+};
 
 
 static void setCssKeyField(const char *cssString, struct CssKeyField *keyField, CssKeyType keytype, char *begin, int length)
@@ -73,7 +79,7 @@ static void setCssKeyField(const char *cssString, struct CssKeyField *keyField, 
         break;
     }
 
-    if (length >= CSS_KEY_MAXSIZE) {
+    if (length >= CSS_KEYVAL_MAXSIZE) {
         printf("Error: css key has too many chars: %s\n", begin);
         abort();
     }
@@ -81,6 +87,25 @@ static void setCssKeyField(const char *cssString, struct CssKeyField *keyField, 
     keyField->offset = begin - cssString;
     keyField->length = length;
     keyField->type = keytype;
+}
+
+
+CssKeyArray CssKeyArrayNew(int num)
+{
+    CssKeyArray keys = (CssKeyArray) malloc(sizeof(struct CssKeyField) * num);
+    if (! keys) {
+        printf("Error: out of memory\n");
+        abort();
+    }
+    return keys;
+}
+
+
+void CssKeyArrayFree(CssKeyArray keys)
+{
+    if (keys) {
+        free(keys);
+    }
 }
 
 
@@ -92,7 +117,7 @@ void CssStringFree(CssString cssString)
 }
 
 
-char * CssParseString(char *cssString, struct CssKeyField *outKeys, int *numKeys)
+char * CssParseString(char *cssString, CssKeyArray outKeys, int *numKeys)
 {
     int p, q, len;
     char tmpChar, *markStr;
@@ -249,7 +274,7 @@ char * CssParseString(char *cssString, struct CssKeyField *outKeys, int *numKeys
 }
 
 
-CssString CssParseFile(FILE *cssFile, struct CssKeyField *outKeys, int *numKeys)
+CssString CssParseFile(FILE *cssFile, CssKeyArray outKeys, int *numKeys)
 {
     rewind(cssFile);
     fseek(cssFile, 0, SEEK_END);
@@ -275,7 +300,7 @@ CssString CssParseFile(FILE *cssFile, struct CssKeyField *outKeys, int *numKeys)
 }
 
 
-void CssPrintKeys(const CssString cssString, const struct CssKeyField *cssKeys, int numKeys)
+void CssPrintKeys(const CssString cssString, const CssKeyArray cssKeys, int numKeys)
 {
     int flag = 1;
 
