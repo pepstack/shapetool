@@ -75,10 +75,10 @@ ifeq ($(OSARCH), MINGW64)
 	# $$MSYS2_HOME: windows 系统环境变量
 	CFLAGS += -D__MINGW64__ -m64
 	INCDIRS += -I$$MSYS2_HOME/mingw64/include
-	LDFLAGS += -L$(LIB_SHAPEFILE_DIR) -L$$MSYS2_HOME/mingw64/lib -lws2_32 -lcairo -lshapefile -lkatana
+	LDFLAGS += -L$(LIB_SHAPEFILE_DIR) -L$$MSYS2_HOME/mingw64/lib -lws2_32 -lcairo -lshapefile
 else ifeq ($(OSARCH), LINUX64)
 	CFLAGS += -D__LINUX__
-    LDFLAGS +=  -L$(LIB_SHAPEFILE_DIR) -L/usr/local/lib -lrt -lshapefile -lkatana
+    LDFLAGS +=  -L$(LIB_SHAPEFILE_DIR) -L/usr/local/lib -lrt -lshapefile
 else
 	$(error $(OSARCH) is not supported)
 endif

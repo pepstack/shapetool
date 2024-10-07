@@ -40,6 +40,12 @@
         "utility": "c",
         "string": "c",
         "string_view": "c",
-        "random": "c"
+        "random": "c",
+        "ratio": "c",
+        "cstring": "c",
+        "initializer_list": "c",
+        "deque": "c",
+        "unordered_map": "c",
+        "vector": "c"
     }
 }

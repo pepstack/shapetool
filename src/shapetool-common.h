@@ -92,7 +92,7 @@ static void onexit_cleanup(void);
 
 static void print_usage();
 
-extern int shpfile2png(const shapetool_options *options);
+extern int shpfile2png(shapetool_options *options);
 
 #ifdef    __cplusplus
 }

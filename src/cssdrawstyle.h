@@ -32,13 +32,7 @@ extern "C" {
 #endif
 
 #include <common/cstrbuf.h>
-
-// css parser
-// https://blog.csdn.net/weixin_41036447/article/details/113731281
-#include <katana.h>
-
-
-#define CSS_CLASS_MAXNUM    10
+#include <common/cssparse.h>
 
 
 typedef struct {
@@ -70,13 +64,6 @@ typedef enum {
 } CssFillStyle;
 
 
-typedef struct {
-    int numClasses;
-    char *classNames[CSS_CLASS_MAXNUM];
-    int nameLens[CSS_CLASS_MAXNUM];
-} CssClassGroup;
-
-
 typedef struct
 {
     // 多边形的外轮廓:
@@ -91,88 +78,37 @@ typedef struct
 } CssPolygonStyle;
 
 
-// https://blog.csdn.net/weixin_41036447/article/details/113731281
-//
-static void CssParseRuleStyle(KatanaStyleRule * styleRule, CssClassGroup * classGroup)
+static void CssParseDrawStyle(const char *cssFile, const char *styleClass)
 {
-    int i;
-    const KatanaArray *selectors = styleRule->selectors;
-
-    for (i = 0; i < selectors->length; i++) {
-        KatanaSelector *sel = (KatanaSelector *) selectors->data[i];
-
-        switch (sel->match) {
-        case KatanaSelectorMatchTag:
-            printf("Processing selector is: %s\n", (sel->tag) ? sel->tag->local : "UNNAMED");
-            //apply_rule(sr->declarations);
-            break;
-        case KatanaSelectorMatchId:
-            break;
-        case KatanaSelectorMatchClass:
-            printf("Processing class selector: %s\n", (sel->data) ? sel->data->value : "UNNAMED");
-            break;
-        case KatanaSelectorMatchPseudoClass: // E.g. a:link
-            break;
-        case KatanaSelectorMatchPseudoElement:
-            break;
-        case KatanaSelectorMatchPagePseudoClass:
-            break;
-        case KatanaSelectorMatchAttributeExact:
-            break;
-        case KatanaSelectorMatchAttributeSet:
-            break;
-        case KatanaSelectorMatchAttributeList:
-            break;
-        case KatanaSelectorMatchAttributeHyphen:
-            break;
-        case KatanaSelectorMatchAttributeContain:
-            break;
-        case KatanaSelectorMatchAttributeBegin:
-            break;
-        case KatanaSelectorMatchAttributeEnd:
-            break;
-        case KatanaSelectorMatchUnknown:
-            break;
-        }
-    }
-}
-
-
-static int CssParseStyleFile(const char *cssFile, CssClassGroup * classGroup)
-{
-    KatanaOutput *cssOutput = 0;
-
-    FILE *fp = fopen(cssFile, "r");
+    FILE * fp = fopen(cssFile, "r");
     if (fp) {
-        cssOutput = katana_parse_in(fp);
-        fclose(fp);
-    }
+        CssString cssString = 0;
+        int numKeys = 0;
+        void *cssOutKeys = 0;
 
-    if (! cssOutput || ! cssOutput->stylesheet) {
-        printf("Error: katana_parse_in() failed for css file: %s\n", cssFile);
-        return -1;
-    }
+        // 测试空间以分配内存
+        cssString = CssParseFile(fp, 0, &numKeys);
+        if (cssString && numKeys < 0) {
+            numKeys = -numKeys;
+            cssOutKeys = malloc(sizeof(struct CssKeyField) * numKeys);
 
-    KatanaStylesheet *sheet = cssOutput->stylesheet;
-    for (int i = 0; i < sheet->rules.length; ++i) {
-        KatanaRule *rule = (KatanaRule *) sheet->rules.data[i];
-        if (! rule) {
-            printf("Warn: rules is empty\n");
-            continue;
+            if (CssParseString(cssString, (struct CssKeyField *) cssOutKeys, &numKeys) && numKeys > 0) {
+                // 使用 cssOutKeys
+                CssPrintKeys(cssString, (struct CssKeyField *) cssOutKeys, numKeys);
+
+                // TODO: 设置 DrawStyle
+                // ...styleClass
+
+
+            }
+
+            free(cssOutKeys);
         }
-        if (rule->type == KatanaRuleStyle) {
-            CssParseRuleStyle((KatanaStyleRule*) rule, classGroup);            
-        } else {
-            printf("Warn: Rule type not supported: %d\n", rule->type);
-            continue;
-        }
+        CssStringFree(cssString);
     }
-
-    return 0;
 }
 
-
-#ifdef    __cplusplus
+#ifdef  __cplusplus
 }
 #endif
 #endif /* CSS_DRAW_STYLE_H__ */

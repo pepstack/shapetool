@@ -15,12 +15,11 @@
 #include "drawshape.h"
 
 
-int shpfile2png(const shapetool_options *options)
+int shpfile2png(shapetool_options *options)
 {
     shapeFileInfo shpInfo;
     cairoDrawCtx CDC;
     cairo_status_t status;
-    CssClassGroup styleClasses;
 
     if (! options->shpfile) {
         return -1;
@@ -36,33 +35,20 @@ int shpfile2png(const shapetool_options *options)
         return -1;
     }
 
-/*
-    styleClasses.classnum =
-        cstr_split_multi_chrs(cstrbufGetStr(options->styleclass), cstrbufGetLen(options->styleclass),
-            ",;", 2,
-            styleClasses.classes, styleClasses.namelens,
-            sizeof(styleClasses.classes)/sizeof(styleClasses.classes[0]));
-
-    if (styleClasses.classnum == 0)
-        // set default class
-        if (shpInfo.nShpTypeMask == SHAPE_TYPE_POLYGON) {
-            styleClasses.classes[0] = mem_strdup_len("polygon", 7);
-            styleClasses.namelens[0] = 7;
-        } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_LINE) {
-            styleClasses.classes[0] = mem_strdup_len("line", 4);
-            styleClasses.namelens[0] = 4;
-        } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_POINT) {
-            styleClasses.classes[0] = mem_strdup_len("point", 5);
-            styleClasses.namelens[0] = 5;
-        } else {
-            styleClasses.classes[0] = mem_strdup_len("*", 1);
-            styleClasses.namelens[0] = 1;
+    // get stype classes
+    if (cstrbufGetStr(options->stylecss)) {
+        if (! cstrbufGetStr(options->styleclass)) {
+            if (shpInfo.nShpTypeMask == SHAPE_TYPE_POLYGON) {
+                options->styleclass = cstrbufDup(options->styleclass, ".polygon", 7);
+            } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_LINE) {
+                options->styleclass = cstrbufDup(options->styleclass, ".line", 5);
+            } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_POINT) {
+                options->styleclass = cstrbufDup(options->styleclass, ".point", 6);
+            }
         }
-        styleClasses.classnum++;
-    }
 
-    ParseCssStyle(cstrbufGetStr(options->style_cssfile), &styleClasses);
-*/
+        CssParseDrawStyle(cstrbufGetStr(options->stylecss), cstrbufGetStr(options->styleclass));
+    }
 
     // create cairo draw context
     CGBox2D dataBox = {
@@ -78,14 +64,11 @@ int shpfile2png(const shapetool_options *options)
 
     if (cairoDrawCtxInit(&CDC, dataBox, viewSize, dot_logical_px, options->dpi)) {
         shapeFileInfoClose(&shpInfo);
-        // katana_destroy_output(cssStyle);
         return -1;
     }
 
     // draw shapes onto canvas
     shapeFileInfoDraw(&shpInfo, &CDC);
-
-    //katana_destroy_output(cssStyle);
 
     status = cairoDrawOutputPng(&CDC, 0, cstrbufGetStr(options->outpng));
 
