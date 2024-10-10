@@ -44,12 +44,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\WORKSPACE\vulkan-dev\Samples\shapetool\source;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\pthreads-w32\Pre-built.2\include;C:\WORKSPACE\vulkan-dev\Samples\shapetool\source\common;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\shapefile\source;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\cairo-windows-1.17.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\pthreads-w32\Pre-built.2\lib\x64;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\cairo-windows-1.17.2\lib\x64;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\shapefile\projects\msvc\shapefile\vcbuild\x64-Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\source;$(ProjectDir)..\..\..\deps\pthreads-w32\Pre-built.2\include;$(ProjectDir)..\..\..\source\common;$(ProjectDir)..\..\..\deps\shapefile\source;$(ProjectDir)..\..\..\deps\cairo-windows-1.17.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\deps\pthreads-w32\Pre-built.2\lib\x64;$(ProjectDir)..\..\..\deps\cairo-windows-1.17.2\lib\x64;$(ProjectDir)..\..\..\deps\shapefile\projects\msvc\shapefile\vcbuild\x64-Debug;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)vcbuild\$(Platform)-$(Configuration)\</OutDir>
+    <IntDir>vcoutput\$(Platform)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>C:\WORKSPACE\vulkan-dev\Samples\shapetool\source;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\pthreads-w32\Pre-built.2\include;C:\WORKSPACE\vulkan-dev\Samples\shapetool\source\common;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\shapefile\source;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\cairo-windows-1.17.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\pthreads-w32\Pre-built.2\lib\x64;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\cairo-windows-1.17.2\lib\x64;C:\WORKSPACE\vulkan-dev\Samples\shapetool\deps\shapefile\projects\msvc\shapefile\vcbuild\x64-Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\..\..\source;$(ProjectDir)..\..\..\deps\pthreads-w32\Pre-built.2\include;$(ProjectDir)..\..\..\source\common;$(ProjectDir)..\..\..\deps\shapefile\source;$(ProjectDir)..\..\..\deps\cairo-windows-1.17.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\..\..\deps\pthreads-w32\Pre-built.2\lib\x64;$(ProjectDir)..\..\..\deps\cairo-windows-1.17.2\lib\x64;$(ProjectDir)..\..\..\deps\shapefile\projects\msvc\shapefile\vcbuild\x64-Release;$(LibraryPath)</LibraryPath>
+    <OutDir>$(ProjectDir)vcbuild\$(Platform)-$(Configuration)\</OutDir>
+    <IntDir>vcoutput\$(Platform)-$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -111,6 +115,9 @@
     <ClCompile Include="..\..\..\source\common\win32\syslog-client.c" />
     <ClCompile Include="..\..\..\source\drawshape.c" />
     <ClCompile Include="..\..\..\source\shapetool.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

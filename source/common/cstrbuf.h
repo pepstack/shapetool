@@ -28,7 +28,7 @@
  *  C String Buffer Functions.
  *
  * @author     Liang Zhang <350137278@qq.com>
- * @version 0.0.13
+ * @version 0.0.14
  * @create     2017-08-28 11:12:10
  * @update     2024-10-04 14:07:46
  */
