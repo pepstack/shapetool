@@ -8,7 +8,7 @@
             "cppStandard": "c++11",
             "includePath": [
 				"${env:MSYS2_HOME}/mingw64/include",
-                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/source/**",
                 "${workspaceFolder}/deps/shapefile/**"
             ],
             "defines": [
@@ -27,7 +27,7 @@
             "includePath": [
                 "/usr/include",
                 "/usr/local/include",
-                "${workspaceFolder}/src/**"
+                "${workspaceFolder}/source/**"
             ],
             "defines": [
                 "_DEBUG"

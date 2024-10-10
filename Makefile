@@ -44,7 +44,7 @@ BUILD ?= RELEASE
 
 # project source dirs
 PREFIX := .
-SRC_DIR := $(PREFIX)/src
+SRC_DIR := $(PREFIX)/source
 DEPS_DIR := $(PREFIX)/deps
 
 COMMON_DIR := $(SRC_DIR)/common
@@ -56,15 +56,15 @@ LIB_SHAPEFILE_DIR := $(DEPS_DIR)/shapefile
 # include dirs for header files (*.h)
 INCDIRS += -I$(SRC_DIR) \
 	-I$(COMMON_DIR) \
-	-I$(LIB_SHAPEFILE_DIR)/src
+	-I$(LIB_SHAPEFILE_DIR)/source
 #
 
-# Set all dirs for C source: './src/a ./src/b'
+# Set all dirs for C source: './source/a ./source/b'
 ALLCDIRS += $(SRC_DIR) \
 	$(COMMON_DIR)
 #
 
-# Get pathfiles for C source files: './src/a/1.c ./src/b/2.c'
+# Get pathfiles for C source files: './source/a/1.c ./source/b/2.c'
 CSRCS := $(foreach cdir, $(ALLCDIRS), $(wildcard $(cdir)/*.c))
 
 # Get names of object files: '1.o 2.o'
@@ -92,7 +92,7 @@ else
 endif
 
 ############################### make target ############################
-.PHONY: all clean help
+.PHONY: all clean help revise
 
 
 all: $(APPNAME)
@@ -104,7 +104,7 @@ $(basename $(notdir $(1))).o: $(1)
 	$(CC) $(CFLAGS) -c $(1) $(INCDIRS) -o $(basename $(notdir $(1))).o
 endef
 
-$(foreach src,$(CSRCS),$(eval $(call COBJS_template,$(src))))
+$(foreach source,$(CSRCS),$(eval $(call COBJS_template,$(source))))
 ################################################################
 
 $(APPNAME): $(COBJS)
@@ -118,7 +118,17 @@ $(APPNAME): $(COBJS)
 
 
 clean:
-	-rm -f *.stackdump *.o $(APPNAME) $(APPNAME).exe
+	@$(PREFIX)/clean.sh $(APPNAME)
+
+
+revise:
+	@/usr/bin/find . -type f -mtime -30 \( -name '*.h' -o -name '*.c' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . -type f -mtime -30 \( -name '*.hxx' -o -name '*.cxx' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . -type f -mtime -30 \( -name '*.hpp' -o -name '*.cpp' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . -type f -mtime -30 \( -name '*.java' -o -name '*.py' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . -type f -mtime -30 -name '*.sh' | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . -type f -mtime -30 -name 'Makefile' | xargs -I {} sh -c "sh revise-source.sh {}"
+	@echo "(Ok) revise source files done."
 
 help:
 	@echo

@@ -1,3 +1,12 @@
+# SHAPETOOL IGNORED DIRS AND FILES
+deps/
+output/
+vcbuild/
+vcoutput/
+.vs/
+*.stackdump
+
+#### github.com ####
 # Prerequisites
 *.d
 
@@ -50,7 +59,3 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
-
-# SHAPETOOL IGNORED DIRS AND FILES
-deps/
-output/
