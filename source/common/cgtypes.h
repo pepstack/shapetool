@@ -25,8 +25,8 @@
  * @author 350137278@qq.com
  * @brief C Gemoetry Types Definitions
  *
- * @version 0.1.1
- * @date 2024-10-06 21:39:13
+ * @version 0.1.2
+ * @date 2024-10-12 13:46:10
  *
  */
 #ifndef GEOMTYPE_H__

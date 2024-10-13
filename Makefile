@@ -1,6 +1,9 @@
-# Makefile both for mingw on windows
-# 2024-09-29
-# Copyright(c) 2024, mapaware.top
+# @file Makefile
+#   Makefile both for mingw on windows
+#
+# @copyright Copyright(c) 2024, mapaware.top
+# @since 2024-09-29 10:00:10
+# @date 2024-10-14 01:36:38
 ########################################################################
 # Linux, CYGWIN_NT, MSYS_NT, ...
 shuname="$(shell uname)"
@@ -72,10 +75,9 @@ COBJS = $(patsubst %.c, %.o, $(notdir $(CSRCS)))
 
 
 ifeq ($(OSARCH), MINGW64)
-	# $$MSYS2_HOME: windows 系统环境变量
 	CFLAGS += -D__MINGW64__ -m64
-	INCDIRS += -I$$MSYS2_HOME/mingw64/include
-	LDFLAGS += -L$(LIB_SHAPEFILE_DIR) -L$$MSYS2_HOME/mingw64/lib -lws2_32 -lcairo -lshapefile
+	INCDIRS += -I/mingw64/include
+	LDFLAGS += -L$(LIB_SHAPEFILE_DIR) -L/mingw64/lib -lws2_32 -lcairo -lshapefile
 else ifeq ($(OSARCH), LINUX64)
 	CFLAGS += -D__LINUX__
     LDFLAGS +=  -L$(LIB_SHAPEFILE_DIR) -L/usr/local/lib -lrt -lshapefile
@@ -122,13 +124,14 @@ clean:
 
 
 revise:
-	@/usr/bin/find . -type f -mtime -30 \( -name '*.h' -o -name '*.c' \) | xargs -I {} sh -c "sh revise-source.sh {}"
-	@/usr/bin/find . -type f -mtime -30 \( -name '*.hxx' -o -name '*.cxx' \) | xargs -I {} sh -c "sh revise-source.sh {}"
-	@/usr/bin/find . -type f -mtime -30 \( -name '*.hpp' -o -name '*.cpp' \) | xargs -I {} sh -c "sh revise-source.sh {}"
-	@/usr/bin/find . -type f -mtime -30 \( -name '*.java' -o -name '*.py' \) | xargs -I {} sh -c "sh revise-source.sh {}"
-	@/usr/bin/find . -type f -mtime -30 -name '*.sh' | xargs -I {} sh -c "sh revise-source.sh {}"
-	@/usr/bin/find . -type f -mtime -30 -name 'Makefile' | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 \( -name '*.h' -o -name '*.c' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 \( -name '*.hxx' -o -name '*.cxx' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 \( -name '*.hpp' -o -name '*.cpp' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 \( -name '*.java' -o -name '*.py' \) | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 -name '*.sh' | xargs -I {} sh -c "sh revise-source.sh {}"
+	@/usr/bin/find . \( -path ./deps -o -path ./.vscode \) -prune -o -type f -mtime -30 -name 'Makefile' | xargs -I {} sh -c "sh revise-source.sh {}"
 	@echo "(Ok) revise source files done."
+
 
 help:
 	@echo

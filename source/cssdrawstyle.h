@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  * @author: Light Zhang <mapaware.top>
- * @date 2024-10-08 00:44:18
+ * @date 2024-10-12 13:46:10
  */
 #ifndef CSS_DRAW_STYLE_H__
 #define CSS_DRAW_STYLE_H__

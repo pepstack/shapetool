@@ -25,9 +25,9 @@
  * @author mapaware@hotmail.com
  * @brief A simple css file parser
  *
- * @version 0.1.10
+ * @version 0.1.11
  * @since 2024-10-08 23:51:27
- * @date 2024-10-10 10:45:40
+ * @date 2024-10-12 13:46:10
  */
 #ifndef CSS_PARSE_H__
 #define CSS_PARSE_H__

@@ -27,10 +27,10 @@
  * @file cstrbuf.h
  *  C String Buffer Functions.
  *
- * @author     Liang Zhang <350137278@qq.com>
- * @version 0.0.14
- * @create     2017-08-28 11:12:10
- * @update     2024-10-04 14:07:46
+ * @author mapaware@hotmail.com
+ * @version 0.0.27
+ * @since 2017-08-28 11:12:10
+ * @date 2024-10-14 01:52:33
  */
 #ifndef _CSTRBUF_H_
 #define _CSTRBUF_H_
@@ -40,8 +40,8 @@ extern "C"
 {
 #endif
 
-#include "memapi.h"
 #include "basetype.h"
+#include "memapi.h"
 
 
 #ifndef cstr_allocate_blocksize
@@ -49,7 +49,7 @@ extern "C"
 #endif
 
 #ifndef cstr_length_maximum
-# define cstr_length_maximum        536870911
+# define cstr_length_maximum        1048576
 #endif
 
 #define cstr_bool_true   1
@@ -1598,8 +1598,10 @@ const char * cstr_timestamp_to_datetime (char *stampms, int mslen, char timestr[
 #define cstrbufGetStr(s)        ((s)? (s)->str : 0)
 
 #define cstrbufPrint(s)         printf("%.*s", cstrbufGetLen(s), cstrbufGetStr(s))
-
 #define cstrbufCharAt(s, i)     ((char *)(s->str+(i)))
+
+#define CBSTR(s)                cstrbufGetStr(s)
+#define CBSTRLEN(s)             cstrbufGetLen(s)
 
 
 typedef struct _cstrbuf_t

@@ -59,7 +59,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);__WINDOWS__</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8</AdditionalOptions>
     </ClCompile>
@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);__WINDOWS__</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);WIN32API</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalOptions>/utf-8</AdditionalOptions>
     </ClCompile>
@@ -114,7 +114,7 @@
     <ClCompile Include="..\..\..\source\common\win32\mmap.c" />
     <ClCompile Include="..\..\..\source\common\win32\syslog-client.c" />
     <ClCompile Include="..\..\..\source\drawshape.c" />
-    <ClCompile Include="..\..\..\source\shapetool.c" />
+    <ClCompile Include="..\..\..\source\shapetoo-mainl.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README.md" />

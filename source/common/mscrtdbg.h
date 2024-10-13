@@ -27,10 +27,10 @@
  *     MSVC _CRTDBG_MAP_ALLOC Marco definition.
  *     The first file you should included
  *
- * @author     350137278@qq.com
- * @version 0.0.4
- * @create     2020-06-12 21:12:22
- * @update     2024-10-10 17:38:42
+ * @author mapaware@hotmail.com
+ * @version 0.0.1
+ * @since 2019-09-30 12:37:44
+ * @date 2024-10-14 01:45:34
  */
 #ifndef MSCRTDBG_H_
 #define MSCRTDBG_H_

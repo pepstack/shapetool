@@ -27,10 +27,10 @@
  * @file memapi.h
  *  memory helper api both for linux and windows.
  *
- * @author     Liang Zhang <350137278@qq.com>
- * @version 0.0.14
- * @create     2018-10-25 09:09:10
- * @update     2024-10-06 13:30:33
+ * @author mapaware@hotmail.com
+ * @version 0.0.27
+ * @since 2018-10-25 09:09:10
+ * @date 2024-10-14 01:52:55
  */
 #ifndef MEMAPI_H_INCLUDED
 #define MEMAPI_H_INCLUDED

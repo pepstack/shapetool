@@ -26,10 +26,10 @@
  * @file basetype.h
  *   Base Definitions and Types, Bob Jenkins, Liang Zhang
  *
- * @author     Liang Zhang <350137278@qq.com>
- * @version 0.0.18
- * @create     2019-09-30 12:37:44
- * @update     2024-10-04
+ * @author mapaware@hotmail.com
+ * @version 0.0.29
+ * @since 2019-09-30 12:37:44
+ * @date 2024-10-14 01:41:51
  */
 #ifndef BASETYPE_H_INCLUDED
 #define BASETYPE_H_INCLUDED
@@ -39,15 +39,15 @@ extern "C"
 {
 #endif
 
-#ifndef WIN32_LEAN_AND_MEAN
-# define WIN32_LEAN_AND_MEAN
+
+#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32API) && !defined(__SYMBIAN32__)
+# ifndef WIN32_LEAN_AND_MEAN
+#   define WIN32_LEAN_AND_MEAN
+# endif
+# define WIN32API
 #endif
 
-#if (defined(_WIN32) || defined(__WIN32__)) && !defined(WIN32) && !defined(__SYMBIAN32__)
-# define WIN32
-#endif
-
-#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(__CYGWIN__)
+#if defined(WIN32API) && !defined(_WIN32_WCE) && !defined(__CYGWIN__)
 # if !(defined(_WINSOCKAPI_) || defined(_WINSOCK_H) || defined(__LWIP_OPT_H__) || defined(LWIP_HDR_OPT_H))
     /* The check above prevents the winsock2 inclusion if winsock.h already
      *  was included, since they can't co-exist without problems.
@@ -68,9 +68,7 @@ extern "C"
     # define __CYGWIN__   1
 #endif
 
-#if defined(WIN32)
-    # define __WINDOWS__   1
-
+#if defined(WIN32API)
 	# undef __WIN64__	/* 64 bits */
 	# undef __WIN86__	/* 32 bits */
 
@@ -168,28 +166,28 @@ extern "C"
 #endif
 
 #ifndef BCOPY
-    # if defined(__WINDOWS__)
+    # if defined(WIN32API)
     #   define bcopy(s,d,n)    memcpy((void*)(d), (const void*)(s), (size_t)(n))
     # endif
     # define BCOPY
 #endif
 
 #ifndef BZERO
-    # if defined(__WINDOWS__)
+    # if defined(WIN32API)
     #   define bzero(s,n)    memset((void*)(s), 0, (size_t)(n))
     # endif
     # define BZERO
 #endif
 
 #ifndef SNPRINTF
-    # if defined(__WINDOWS__)
+    # if defined(WIN32API)
     #   define snprintf    _snprintf
     # endif
     # define SNPRINTF
 #endif
 
 #ifndef STRTOK
-    # if defined(__WINDOWS__)
+    # if defined(WIN32API)
     #   define strtok_r    strtok_s
     # endif
     # define STRTOK

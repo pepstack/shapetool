@@ -68,7 +68,7 @@
     <ClCompile Include="..\..\..\source\drawshape.c">
       <Filter>source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\shapetool.c">
+    <ClCompile Include="..\..\..\source\shapetoo-mainl.c">
       <Filter>source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\common\cssparse.c">

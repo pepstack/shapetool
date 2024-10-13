@@ -36,17 +36,19 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __WINDOWS__
+#ifdef WIN32API
 # include <win32/getoptw.h>
 
 # if !defined(__MINGW__)
- // link to pthread-w32 lib for MS Windows with MSVC
- #pragma comment(lib, "pthreadVC2.lib")
+    // link to pthread-w32 lib for MS Windows with MSVC
+#pragma comment(lib, "pthreadVC2.lib")
 # endif
 #else
-// Linux: see Makefile
+    // Linux: see Makefile
 #   include <getopt.h>
 #endif
+
+#include <common/misc.h>
 
 #include "cairodrawctx.h"
 
@@ -57,8 +59,9 @@ extern "C" {
 # define AAAA
 #endif
 
-#define SHAPETOOL_NAME_MAXLEN    30
-#define SHAPETOOL_PATH_MAXLEN   255
+#define SHAPETOOL_NAME_MAXLEN       30
+
+#define SHAPETOOL_PATHLEN_INVALID  256
 
 
 #define SHAPETOOL_OPT_DRAWSHP    1
@@ -71,21 +74,42 @@ extern "C" {
 #define SHAPETOOL_OPT_STYLECLASS 7      // style class names
 #define SHAPETOOL_OPT_STYLECSS   8      // style css file (/path/to/style.css)
 
+#define FILE_URI_PREFIX  "file://"
+#define FILE_URI_PREFIX_LEN      7      // strlen("file://")
 
-typedef struct
-{
-    unsigned int shpfile: 1;
-    unsigned int outpng: 1;
-    unsigned int width: 1;
-    unsigned int height: 1;
-    unsigned int dpi: 1;
-    unsigned int styleclass: 1;
-    unsigned int stylecss: 1;
+#define PATH_IS_FILE_URI(path)      ((const char *) strstr((path), FILE_URI_PREFIX)) == ((const char*)(path))
+
+// file:///path/to => /path/to
+#define FILE_URI_PATH(szpath)         (&((szpath)[FILE_URI_PREFIX_LEN]))
+#define CSTR_FILE_URI_PATH(cspath)    FILE_URI_PATH(CBSTR(cspath))
+
+
+typedef enum {
+    command_first = 0,
+    command_drawshape = command_first,
+    command_end
+} shapetool_command;
+
+
+static const char* commands[] = {
+    "drawshape",
+    "statshape",
+    0
+};
+
+
+typedef struct {
+    unsigned int shpfile : 1;
+    unsigned int outpng : 1;
+    unsigned int width : 1;
+    unsigned int height : 1;
+    unsigned int dpi : 1;
+    unsigned int styleclass : 1;
+    unsigned int stylecss : 1;
 } shapetool_flags;
 
 
-typedef struct
-{
+typedef struct {
     cstrbuf shpfile;
     cstrbuf outpng;
 
@@ -97,12 +121,7 @@ typedef struct
     int     dpi;
 } shapetool_options;
 
-
-static void onexit_cleanup(void);
-
-static void print_usage();
-
-extern int shpfile2png(shapetool_options *options);
+extern int shpfile2png(shapetool_flags *flags, shapetool_options* options);
 
 #ifdef    __cplusplus
 }

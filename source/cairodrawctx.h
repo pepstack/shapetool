@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  * @author: Light Zhang <mapaware.top>
- * @date 2024-10-10 20:38:30
+ * @date 2024-10-14 00:56:50
  */
 #ifndef CAIRO_MAP_CANVAS_H__
 #define CAIRO_MAP_CANVAS_H__
@@ -33,7 +33,7 @@ extern "C" {
 
 
 
-#ifdef __WINDOWS__
+#ifdef WIN32API
 #   if !defined(__MINGW__)
     // cairo 2d draw api
     #include "cairo.h"
@@ -73,6 +73,11 @@ extern "C" {
 #ifndef CAIRO_DRAW_WIDTH_MAX
 #   define CAIRO_DRAW_WIDTH_MAX       16384
 #   define CAIRO_DRAW_HEIGHT_MAX      16384
+#endif
+
+#ifndef CAIRO_DRAW_WIDTH_MIN
+#   define CAIRO_DRAW_WIDTH_MIN       128
+#   define CAIRO_DRAW_HEIGHT_MIN      96
 #endif
 
 #ifndef CAIRO_DRAW_WIDTH_DEFAULT
