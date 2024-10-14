@@ -25,9 +25,9 @@
  * @brief A simple css file parser
  *
  * @author mapaware@hotmail.com
- * @version 0.0.14
+ * @version 0.0.15
  * @since 2024-10-07 23:45:12
- * @date 2024-10-15 02:02:42
+ * @date 2024-10-15 02:21:05
  */
 #include <stdio.h>
 #include <string.h>
@@ -51,9 +51,6 @@
             abort(); \
         } \
     } while(0)
-
-
-#define CssKeyArraySetSize(cssKeys)  (int)(((struct CssKeyField*)(cssKeys - 1))->numKeys)
 
 
 static const char* css_bitflag_array[] = {
@@ -446,13 +443,12 @@ static int cssParseKeys(CssString cssString, CssKeyArray outKeys)
 
         if (p > 0) {
             // 如果发现选择器
-            keys += setCssKeyField(cssString->sbbuf, ((outKeys && keys < SizeKeys) ? &outKeys[keys] : 0),
-                keytype, begin, p);
+            keys += setCssKeyField(cssString->sbbuf, ((outKeys && keys < SizeKeys) ? &outKeys[keys] : 0), keytype, begin, p);
             CssCheckNumKeys(keys);
 
             markStr = start + len - 1;
-            DEBUG_ASSERT(*markStr == '}')
-                * markStr = ';';
+            DEBUG_ASSERT(*markStr == '}');
+            *markStr = ';';
             tmpChar = *next; *next = '\0';
 
             start++;
