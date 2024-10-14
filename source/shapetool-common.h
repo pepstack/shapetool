@@ -49,6 +49,7 @@ extern "C" {
 #endif
 
 #include <common/misc.h>
+#include <common/cssparse.h>
 
 #include "cairodrawctx.h"
 
@@ -105,7 +106,7 @@ typedef struct {
     unsigned int height : 1;
     unsigned int dpi : 1;
     unsigned int styleclass : 1;
-    unsigned int stylecss : 1;
+    unsigned int style : 1;
 } shapetool_flags;
 
 
@@ -114,14 +115,14 @@ typedef struct {
     cstrbuf outpng;
 
     cstrbuf styleclass;  // style class names
-    cstrbuf stylecss;    // style css file (/path/to/style.css)
+    CssKeyArray cssStyleKeys; // css parsed keys
 
     float   width;      // width in dots
     float   height;     // height in dots
     int     dpi;
 } shapetool_options;
 
-extern int shpfile2png(shapetool_flags *flags, shapetool_options* options);
+int shpfile2png(shapetool_flags *flags, shapetool_options* options);
 
 #ifdef    __cplusplus
 }

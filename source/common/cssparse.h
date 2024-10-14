@@ -25,9 +25,9 @@
  * @author mapaware@hotmail.com
  * @brief A simple css file parser
  *
- * @version 0.1.11
+ * @version 0.1.13
  * @since 2024-10-08 23:51:27
- * @date 2024-10-12 13:46:10
+ * @date 2024-10-15 01:17:06
  */
 #ifndef CSS_PARSE_H__
 #define CSS_PARSE_H__
@@ -38,7 +38,8 @@ extern "C"
 #endif
 
 
-typedef struct CssKeyField  *CssKeyArray, *CssKeyArrayNode;
+typedef struct CssKeyField *CssKeyArray, *CssKeyArrayNode;
+
 
 // NOTE:
 //   Input CSS String's Max Length  < 1024*1024 bytes
@@ -53,6 +54,13 @@ typedef struct CssKeyField  *CssKeyArray, *CssKeyArrayNode;
 #define CSS_KEY_FLAGS_INVALID_65536      0x10000    // 16bit: 最大 65535
 #define CSS_KEYINDEX_INVALID_4096        0x1000     // 12bit: 最多 4096 个 Keys, 索引=[0 ... 4095 (0xFFF)]
 #define CSS_VALUELEN_INVALID_256         0x100      // 8bit:  键值的长度最大 255 个字符: CSS_VALUELEN_INVALID - 1
+
+
+typedef struct CssStringBuffer {
+    unsigned int sbsize;
+    unsigned int sblen;
+    char sbbuf[0];
+} *CssString;
 
 
 typedef enum {
@@ -82,10 +90,14 @@ typedef enum {
 } CssBitFlag;
 
 
-extern CssKeyArray CssKeyArrayNew(int num);
+extern CssString CssStringNew(const char* cssStr, size_t cssStrLen);
+extern CssString CssStringNewFromFile(FILE *cssfile);
+extern void CssStringFree(CssString cssString);
+
+extern CssKeyArray CssStringParse(CssString cssString);
 extern void CssKeyArrayFree(CssKeyArray keys);
 
-extern int CssParseString(char* cssString, CssKeyArray outKeys);
+extern const char * CssKeyArrayGetString(const CssKeyArray cssKeys, unsigned int offset);
 
 extern int CssKeyArrayGetSize(const CssKeyArray cssKeys);
 extern int CssKeyArrayGetUsed(const CssKeyArray cssKeys);
@@ -101,7 +113,10 @@ extern int CssKeyFlagToString(int keyflag, char* outbuf, size_t buflen);
 extern int CssClassGetKeyIndex(const CssKeyArrayNode cssClassKey);
 
 // 完全使用头文件 API, 展示了如何使用 cssparse 解析和输出 CSS
-extern void CssKeyArrayPrint(const char *cssString, const CssKeyArray cssKeys, FILE *fpout);
+extern void CssKeyArrayPrint(const CssKeyArray cssKeys, FILE* outfd);
+
+// 查询指定名称的 class 节点
+extern int CssKeyArrayQueryClass(const CssKeyArray cssKeys, CssKeyType classType, const char* className, int classNameLen, CssKeyArrayNode classNodes[32]);
 
 #ifdef __cplusplus
 }

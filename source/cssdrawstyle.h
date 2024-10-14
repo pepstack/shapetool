@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  * @author: Light Zhang <mapaware.top>
- * @date 2024-10-12 13:46:10
+ * @date 2024-10-15 01:21:42
  */
 #ifndef CSS_DRAW_STYLE_H__
 #define CSS_DRAW_STYLE_H__
@@ -77,6 +77,46 @@ typedef struct
     CssColorRGB fill_color;
 } CssDrawStyle;
 
+
+static CssKeyArray cssStyleLoadString(const char* cssarg, int csslen)
+{
+    CssString cssString = CssStringNew(cssarg, csslen);
+    CssKeyArray keys = CssStringParse(cssString);
+    if (!keys) {
+        CssStringFree(cssString);
+    }
+    return keys;
+}
+
+
+static CssKeyArray cssStyleLoadFile(const char* csspathfile)
+{
+    FILE * cssfile = fopen(csspathfile, "r");
+    if (cssfile) {
+        CssString cssString = CssStringNewFromFile(cssfile);
+        fclose(cssfile);
+
+        if (!cssString) {
+            printf("Error: CssStringNewFromFile() failed. cssfile=%s\n", csspathfile);
+            exit(1);
+        }
+
+        CssKeyArray keys = CssStringParse(cssString);
+        if (!keys) {
+            printf("Error: CssStringParse() failed\n");
+            CssStringFree(cssString);
+            exit(1);
+        }
+
+        CssKeyArrayPrint(keys, stdout);
+
+        // success
+        return keys;
+    }
+
+    // error
+    return 0;
+}
 
 #ifdef  __cplusplus
 }

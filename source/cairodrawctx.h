@@ -22,7 +22,7 @@
  * SOFTWARE.
  *
  * @author: Light Zhang <mapaware.top>
- * @date 2024-10-14 00:56:50
+ * @date 2024-10-15 02:03:55
  */
 #ifndef CAIRO_MAP_CANVAS_H__
 #define CAIRO_MAP_CANVAS_H__
@@ -177,41 +177,14 @@ static void cairoDrawCtxFinal(cairoDrawCtx *CDC)
 }
 
 
-static void cairoDrawCtxSetCssStyle(cairoDrawCtx *CDC, const char *cssFile, const char *cssClass)
+static void cairoDrawCtxSetStyle(cairoDrawCtx *CDC, const CssKeyArray cssStyleKeys, cstrbuf styleClass)
 {
-    FILE * fp = fopen(cssFile, "r");
-    if (! fp) {
-        printf("Warn: invalid css file: %s\n", cssFile);
-        return;
-    }
+    CssKeyArrayNode classNodes[32] = { 0 };
+    int Nodes = CssKeyArrayQueryClass(cssStyleKeys, css_type_class, styleClass->str, styleClass->len, classNodes);
 
-    /*
-    CssString cssString = 0;
-    int numKeys = 0;
-    CssKeyArray cssOutKeys = 0;
-
-    // 测试空间以分配内存
-    cssString = CssParseFile(fp, 0, &numKeys);
-    fclose(fp);
-
-    if (cssString && numKeys < 0) {
-        numKeys = -numKeys;
-        cssOutKeys = CssKeyArrayNew(numKeys);
-
-        if (CssParseString(cssString, cssOutKeys, &numKeys) && numKeys > 0) {
-            // 使用 cssOutKeys
-            CssPrintKeys(cssString, cssOutKeys, numKeys);
-
-            // TODO: 设置 DrawStyle
-            // ...styleClass
+    // TODO: set CDC with style
 
 
-        }
-
-        CssKeyArrayFree(cssOutKeys);
-    }
-    CssStringFree(cssString);
-    */
 }
 
 

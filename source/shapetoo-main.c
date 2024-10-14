@@ -4,10 +4,10 @@
  *
  * @author mapaware@hotmail.com
  * @copyright © 2024-2030 mapaware.top All Rights Reserved.
- * @version 0.0.5
+ * @version 0.0.6
  *
  * @since 2024-10-03 00:05:20
- * @date 2024-10-14 01:07:40
+ * @date 2024-10-15 00:31:27
  *
  * @note
  *     https://github.com/pepstack/shapefile
@@ -20,10 +20,11 @@ shapetool_options options = { 0 };
 
 static void onexit_cleanup(void)
 {
+    CssKeyArrayFree(options.cssStyleKeys);
+
     cstrbufFree(&options.shpfile);
     cstrbufFree(&options.outpng);
     cstrbufFree(&options.styleclass);
-    cstrbufFree(&options.stylecss);
 }
 
 
@@ -89,6 +90,11 @@ static void print_usage()
  * @return int
  *
  *   $ shapetool drawshape --shpfile=/path/to/input.shp --outpng=/path/to/output.png
+ *
+ * DEBUG:
+ *   $ shapetool drawshape --shpfile ../../../shps/area.shp --outpng ../../../output/area2.png
+ *
+ *   $ shapetool drawshape --shpfile ../../../shps/area.shp --outpng ../../../output/area2.png --stylecss ".polygon { border: 3 solid #000FFF; fill: 1 solid #CFF000}"
  */
 int main(int argc, char* argv[])
 {
@@ -110,8 +116,8 @@ int main(int argc, char* argv[])
         ,{"width", required_argument, &flag, SHAPETOOL_OPT_WIDTH}
         ,{"height", required_argument, &flag, SHAPETOOL_OPT_HEIGHT}
         ,{"dpi", required_argument, &flag, SHAPETOOL_OPT_DPI}
-        ,{"style-class", required_argument, &flag, SHAPETOOL_OPT_STYLECLASS}
-        ,{"style-css", required_argument, &flag, SHAPETOOL_OPT_STYLECSS}
+        ,{"styleclass", required_argument, &flag, SHAPETOOL_OPT_STYLECLASS}
+        ,{"stylecss", required_argument, &flag, SHAPETOOL_OPT_STYLECSS}
         ,{0, 0, 0, 0}
     };
 
@@ -203,16 +209,17 @@ int main(int argc, char* argv[])
                     printf("Error: invalid style css\n");
                     exit(1);
                 }
+                cstrbuf cssPathfile = 0;
                 if (strchr(optarg, '{') && strchr(optarg, '}') && strchr(optarg, '{') != optarg) {
-                    // is css string
-                    options.stylecss = cstrbufDup(options.stylecss, optarg, cstrbuf_error_size_len);
-                    flags.stylecss = 1;
+                    // css string
+                    options.cssStyleKeys = cssStyleLoadString(optarg, blen);
                 }
-                else {
-                    blen = check_pathfile_arg(optarg, ".css", 1);
-                    if (set_options_file(optarg, blen, &options.stylecss)) {
-                        flags.stylecss = 1;
-                    }
+                else if (set_options_file(optarg, blen, &cssPathfile)) {
+                    options.cssStyleKeys = cssStyleLoadFile(CSTR_FILE_URI_PATH(cssPathfile));
+                }
+                cstrbufFree(&cssPathfile);
+                if (options.cssStyleKeys) {
+                    flags.style = 1;
                 }
                 break;
             }
@@ -233,18 +240,23 @@ int main(int argc, char* argv[])
             exit(1);
         }
 
-        if (! flags.stylecss) {
+        if (! flags.style) {
             // If both stylecss not given:
             //   set 'a.shp' with default style css file: 'a.css'
-            options.stylecss = cstrbufCat(options.stylecss, "%.*s.css", CBSTRLEN(options.shpfile) - 4, CBSTR(options.shpfile));
-            printf("Info: use default style css: %s\n", options.stylecss->str);
+            cstrbuf cssPathfile = cstrbufCat(0, "%.*s.css", CBSTRLEN(options.shpfile) - 4, CBSTR(options.shpfile));
+            printf("Info: use default style css: %s\n", CBSTR(cssPathfile));
 
             // check if default css file exists
-            if (! pathfile_exists(CSTR_FILE_URI_PATH(options.stylecss))) {
-                printf("Error: style css file not found: %.*s\n", CBSTRLEN(options.stylecss), CBSTR(options.stylecss));
+            if (! pathfile_exists(CSTR_FILE_URI_PATH(cssPathfile))) {
+                printf("Error: style css file not found: %.*s\n", CBSTRLEN(cssPathfile), CBSTR(cssPathfile));
                 exit(1);
             }
-            flags.stylecss = 1;
+            options.cssStyleKeys = cssStyleLoadFile(CSTR_FILE_URI_PATH(cssPathfile));
+            cstrbufFree(&cssPathfile);
+
+            if (options.cssStyleKeys) {
+                flags.style = 1;
+            }
         }
 
         // default settings for view canvas

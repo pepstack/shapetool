@@ -28,9 +28,9 @@
  *  C String Buffer Functions.
  *
  * @author mapaware@hotmail.com
- * @version 0.0.27
+ * @version 0.0.28
  * @since 2017-08-28 11:12:10
- * @date 2024-10-14 01:52:33
+ * @date 2024-10-14 02:33:19
  */
 #ifndef _CSTRBUF_H_
 #define _CSTRBUF_H_
@@ -1778,7 +1778,7 @@ cstrbuf cstrbufCat (cstrbuf dst, const char *fmt, ...)
 NOWARNING_UNUSED(static)
 cstrbuf cstrbufTrunc (cstrbuf s, ub4 len)
 {
-    if (s->len > len) {
+    if (s->len >= len) {
         s->len = len;
         s->str[s->len] = 0;
     }

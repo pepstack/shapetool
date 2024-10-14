@@ -12,6 +12,9 @@ Polygon Shape 的绘制风格 CSS 如下：
         ...
     }
 
+
+    .polygon { border: 3 solid #000FFF; fill: 1 solid #CFF000}
+
 下面的属性定义了多边形边界的绘制：
 
 - border-color: 边框颜色
@@ -28,7 +31,7 @@ Polygon Shape 的绘制风格 CSS 如下：
 
 下面的属性定义了多边形的内部填充绘制：
 
-- fill-opacity: 0; // 0: 全透明, 1 部透明
+- fill-opacity: 0; // 0: 全透明, 1 不透明
 
 - fill-style: solid
 

@@ -2,8 +2,8 @@
  * @file drawshape.c
  * @author 350137278@qq.com
  * @brief draw shape file on to a png file
- * @version 0.0.5
- * @date 2024-10-14 01:12:06
+ * @version 0.0.7
+ * @date 2024-10-15 01:33:13
  *
  * @copyright Copyright (c) 2024, mapaware.top
  *
@@ -21,21 +21,23 @@ int shpfile2png(shapetool_flags *flags, shapetool_options *options)
     cairoDrawCtx CDC;
     cairo_status_t status;
 
-    // load shp file: file://
+    // load shp file: file:///path/to/some.shp
     if (shapeFileInfoOpen(&shpInfo, CSTR_FILE_URI_PATH(options->shpfile)) != 0) {
         return -1;
     }
 
     // get stype classes
-    if (flags->stylecss) {
+    if (flags->style) {
         // if css file provided, check css class
-        if (! flags->styleclass) {
-            // if not class given , use default class name depenps on the type of shape
+        if (!flags->styleclass) {
+            // if not class given , set default class name by type of shape
             if (shpInfo.nShpTypeMask == SHAPE_TYPE_POLYGON) {
                 options->styleclass = cstrbufDup(options->styleclass, ".polygon", 8);
-            } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_LINE) {
+            }
+            else if (shpInfo.nShpTypeMask == SHAPE_TYPE_LINE) {
                 options->styleclass = cstrbufDup(options->styleclass, ".line", 5);
-            } else if (shpInfo.nShpTypeMask == SHAPE_TYPE_POINT) {
+            }
+            else if (shpInfo.nShpTypeMask == SHAPE_TYPE_POINT) {
                 options->styleclass = cstrbufDup(options->styleclass, ".point", 6);
             }
             flags->styleclass = 1;
@@ -59,8 +61,10 @@ int shpfile2png(shapetool_flags *flags, shapetool_options *options)
         return -1;
     }
 
-    // parse css file and config draw style
-    cairoDrawCtxSetCssStyle(&CDC, CBSTR(options->stylecss), CBSTR(options->styleclass));
+    if (flags->style && flags->styleclass) {
+        // set draw context with css style
+        cairoDrawCtxSetStyle(&CDC, options->cssStyleKeys, options->styleclass);
+    }
 
     // draw shapes onto cairo
     shapeFileInfoDraw(&shpInfo, &CDC);

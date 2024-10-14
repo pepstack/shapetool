@@ -94,6 +94,7 @@
     <ClInclude Include="..\..\..\source\common\cssparse.h" />
     <ClInclude Include="..\..\..\source\common\cstrbuf.h" />
     <ClInclude Include="..\..\..\source\common\memapi.h" />
+    <ClInclude Include="..\..\..\source\common\misc.h" />
     <ClInclude Include="..\..\..\source\common\mscrtdbg.h" />
     <ClInclude Include="..\..\..\source\common\smallregex.h" />
     <ClInclude Include="..\..\..\source\common\viewport.h" />
@@ -114,9 +115,10 @@
     <ClCompile Include="..\..\..\source\common\win32\mmap.c" />
     <ClCompile Include="..\..\..\source\common\win32\syslog-client.c" />
     <ClCompile Include="..\..\..\source\drawshape.c" />
-    <ClCompile Include="..\..\..\source\shapetoo-mainl.c" />
+    <ClCompile Include="..\..\..\source\shapetoo-main.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\CSS_polygon.md" />
     <None Include="..\..\..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
