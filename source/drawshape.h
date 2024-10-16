@@ -1,28 +1,39 @@
+/******************************************************************************
+* Copyright © 2024-2035 Light Zhang <mapaware@hotmail.com>, MapAware, Inc.
+* ALL RIGHTS RESERVED.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+******************************************************************************/
 /**
- * Copyright © 2024 MapAware, Inc.
+ * @file drawshape.h
+ * @brief draw shape file on to a png file.
  *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy,
- * modify, merge, publish, distribute, sublicense, and/or sell copies
- * of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * @author mapaware@hotmail.com
+ * @copyright © 2024-2030 mapaware.top All Rights Reserved.
+ * @version 0.0.9
  *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
+ * @since 2024-10-13 22:24:17
+ * @date 2024-10-16 22:41:24
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
- * MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
- * BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
- * ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
- * CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * @note
+ *   https://github.com/pepstack/shapefile
  *
- * @author: Light Zhang <mapaware.top>
- * @date 2024-10-13 22:24:17
  */
 #ifndef DRAW_SHAPE_H__
 #define DRAW_SHAPE_H__
@@ -144,85 +155,6 @@ static void shapeFileInfoDraw(shapeFileInfo *shpInfo, cairoDrawCtx *CDC)
     }
 
     SHPDestroyObjectEx(shapeReadRef);
-}
-
-
-void drawPolygonShape(const SHPObjectEx *hShpRef, cairoDrawCtx *cdc)
-{
-    int i, part, cnt;
-    double X0, Y0, X, Y;
-
-    SHPPointType  *points, *ppt;
-
-    cairo_t *cr = cdc->cr;
-    Viewport2D *vwp = &(cdc->viewport);
-
-    ///CssPolygonStyle * polygon = &cdc->polygonStyle;
-
-    cairo_save(cr);
-
-    for (part = 0; part < hShpRef->nParts; part++) {
-        /* start index of points of current part */
-        int start = hShpRef->panPartStart[part];
-
-        /* type of current part */
-        int parttype = hShpRef->panPartType[part];
-
-        /* number of points of part */
-        int npp = hShpRef->panPartStart[part+1] - start;
-
-        if (npp > 0) {
-            points = &hShpRef->pPoints[start];
-
-            if (part == 0) {
-                /* first part as contour path */
-                cairo_new_path(cr);
-            } else {
-                /* hole path */
-                cairo_new_sub_path(cr);
-            }
-
-            i = cnt = 0;
-            ppt = &points[i++];
-
-            DataToViewXY(vwp, ppt->x, ppt->y, &X0, &Y0);
-
-            cairo_move_to(cr, X0, Y0);
-
-            while(i < npp) {
-                ppt = &points[i++];
-
-                DataToViewXY(vwp, ppt->x, ppt->y, &X, &Y);
-
-                if (CGPointNotEqual(X, Y, X0, Y0, 0.5)) {
-                    cairo_line_to(cr, X, Y);
-                    X0 = X;
-                    Y0 = Y;
-                }
-            }
-
-            cairo_close_path(cr);
-        }
-        else {
-            // empty path
-        }
-    }
-
-    if (part) {
-        // success returns 0
-        /// cairo_set_source_rgb(cr, polygon->fill_color.red, polygon->fill_color.green, polygon->fill_color.blue);
-        cairo_set_source_rgb(cr, 128, 0, 128);
-        cairo_fill_preserve(cr);
-
-        ///cairo_set_source_rgb(cr, polygon->border_color.red, polygon->border_color.green, polygon->border_color.blue);
-        cairo_set_source_rgb(cr, 0, 160, 35);
-        cairo_stroke(cr);
-    }
-    else {
-        // empty shape
-    }
-
-    cairo_restore(cr);
 }
 
 

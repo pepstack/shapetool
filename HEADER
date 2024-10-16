@@ -21,39 +21,15 @@
 * SOFTWARE.
 ******************************************************************************/
 /**
- * @file shapetool-version.h
+ * @file
  * @brief
  *
- * @author mapaware@hotmail.com
- * @copyright © 2024-2030 mapaware.top All Rights Reserved.
- * @version 0.0.8
+ * @author
+ * @copyright
+ * @version
  *
- * @since 2024-10-03 00:05:20
- * @date 2024-10-16 22:06:14
+ * @since
+ * @date
  *
  * @note
  */
-#ifndef SHAPETOOL_VERSION_H__
-#define SHAPETOOL_VERSION_H__
-
-#ifndef SHAPETOOL_COMMON_H__
-#  error shapetool-version.h should only be included by shapetool-common.h
-#endif
-
-#define SHAPETOOL_VERSION_MAJOR 0
-#define SHAPETOOL_VERSION_MINOR 0
-#define SHAPETOOL_VERSION_MICRO 1
-
-#define SHAPETOOL_VERSION_STRING "0.0.1"
-
-#define SHAPETOOL_VERSION_ENCODE(major, minor, micro) ( \
-      ((major) * 10000)				\
-    + ((minor) *   100)				\
-    + ((micro) *     1))
-
-#define SHAPETOOL_VERSION SHAPETOOL_VERSION_ENCODE( \
-    SHAPETOOL_VERSION_MAJOR, \
-    SHAPETOOL_VERSION_MINOR, \
-    SHAPETOOL_VERSION_MICRO)
-
-#endif /* SHAPETOOL_VERSION_H__ */

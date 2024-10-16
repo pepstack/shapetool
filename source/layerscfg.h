@@ -21,62 +21,31 @@
 * SOFTWARE.
 ******************************************************************************/
 /**
- * @file mscrtdbg.h
- * @brief MSVC _CRTDBG_MAP_ALLOC Marco definition.
+ * @file layerscfg.h
+ * @brief
  *
  * @author mapaware@hotmail.com
  * @copyright © 2024-2030 mapaware.top All Rights Reserved.
- * @version 0.0.28
+ * @version 0.0.3
  *
- * @since 2019-09-30 12:37:44
- * @date 2024-10-16 22:08:37
+ * @since 2024-10-16 21:58:17
+ * @date 2024-10-16 22:54:01
  *
  * @note
- *   The first file you should included.
  */
-#ifndef MSCRTDBG_H_
-#define MSCRTDBG_H_
+#ifndef CSS_LAYERS_CFG_H__
+#define CSS_LAYERS_CFG_H__
 
-#if defined(__cplusplus)
+#ifdef    __cplusplus
 extern "C" {
 #endif
 
-#if defined(_MSC_VER)
-    // warning C4996: 'vsnprintf': This function or variable may be unsafe.
-    // Consider using vsnprintf_s instead.
-    //  To disable deprecation, use _CRT_SECURE_NO_WARNINGS
-    # pragma warning(disable:4996)
+#include <common/cstrbuf.h>
+#include <common/readconf.h>
 
-    # if defined(_DEBUG)
-        /** memory leak auto-detect in MSVC
-         * https://blog.csdn.net/lyc201219/article/details/62219503
-         */
-        # include <crtdbg.h>
-        # ifndef _CRTDBG_MAP_ALLOC
-            # define _CRTDBG_MAP_ALLOC
-        # endif
-        # include <stdlib.h>
-        # include <malloc.h>
 
-        # ifndef WINDOWS_CRTDBG_ON
-            # define WINDOWS_CRTDBG_ON  _CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) | _CRTDBG_LEAK_CHECK_DF);
-        # endif
-    # else
-        # ifdef _CRTDBG_MAP_ALLOC
-            # undef _CRTDBG_MAP_ALLOC
-        # endif
 
-        # include <stdlib.h>
-        # include <malloc.h>
-
-        # ifndef WINDOWS_CRTDBG_ON
-            # define WINDOWS_CRTDBG_ON
-        # endif
-    # endif
-#endif
-
-#if defined(__cplusplus)
+#ifdef  __cplusplus
 }
 #endif
-
-#endif /* MSCRTDBG_H_ */
+#endif /* CSS_LAYERS_CFG_H__ */

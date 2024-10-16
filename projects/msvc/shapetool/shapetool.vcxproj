@@ -96,6 +96,7 @@
     <ClInclude Include="..\..\..\source\common\memapi.h" />
     <ClInclude Include="..\..\..\source\common\misc.h" />
     <ClInclude Include="..\..\..\source\common\mscrtdbg.h" />
+    <ClInclude Include="..\..\..\source\common\readconf.h" />
     <ClInclude Include="..\..\..\source\common\smallregex.h" />
     <ClInclude Include="..\..\..\source\common\viewport.h" />
     <ClInclude Include="..\..\..\source\common\win32\getoptw.h" />
@@ -103,22 +104,27 @@
     <ClInclude Include="..\..\..\source\common\win32\mman.h" />
     <ClInclude Include="..\..\..\source\common\win32\syslog.h" />
     <ClInclude Include="..\..\..\source\cssdrawstyle.h" />
+    <ClInclude Include="..\..\..\source\drawlayers.h" />
     <ClInclude Include="..\..\..\source\drawshape.h" />
+    <ClInclude Include="..\..\..\source\layerscfg.h" />
     <ClInclude Include="..\..\..\source\shapetool-common.h" />
     <ClInclude Include="..\..\..\source\shapetool-version.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\common\cssparse.c" />
+    <ClCompile Include="..\..\..\source\common\readconf.c" />
     <ClCompile Include="..\..\..\source\common\smallregex.c" />
     <ClCompile Include="..\..\..\source\common\win32\getoptw.c" />
     <ClCompile Include="..\..\..\source\common\win32\getopt_longw.c" />
     <ClCompile Include="..\..\..\source\common\win32\mmap.c" />
     <ClCompile Include="..\..\..\source\common\win32\syslog-client.c" />
+    <ClCompile Include="..\..\..\source\drawlayers.c" />
     <ClCompile Include="..\..\..\source\drawshape.c" />
-    <ClCompile Include="..\..\..\source\shapetoo-main.c" />
+    <ClCompile Include="..\..\..\source\shapetool-main.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\CSS_polygon.md" />
+    <None Include="..\..\..\map-layers.cfg" />
     <None Include="..\..\..\README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

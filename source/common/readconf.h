@@ -1,36 +1,38 @@
-/***********************************************************************
- * Copyright (c) 2008-2080 pepstack.com, 350137278@qq.com
- *
- * ALL RIGHTS RESERVED.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **********************************************************************/
-
+/******************************************************************************
+* Copyright © 2024-2035 Light Zhang <mapaware@hotmail.com>, MapAware, Inc.
+* ALL RIGHTS RESERVED.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+******************************************************************************/
 /**
  * @file readconf.h
- *  read ini file api for Linux and Windows.
+ * @brief read ini file api for Linux and Windows.
  *
  * @author mapaware@hotmail.com
- * @version 0.0.1
+ * @copyright © 2024-2030 mapaware.top All Rights Reserved.
+ * @version 1.0.2
+ *
  * @since 2012-05-21 12:37:44
- * @date 2024-10-14 01:43:03
+ * @date 2024-10-17 03:39:22
+ *
+ * @note
+ *   The first file you should included.
  */
 #ifndef _READCONF_H__
 #define _READCONF_H__
@@ -72,12 +74,27 @@ typedef int READCONF_RESULT;
     # define READCONF_MAX_LINESIZE     4096
 #endif
 
-#ifndef READCONF_MAX_SECNAME
-    # define READCONF_MAX_SECNAME      READCONF_MAX_LINESIZE
+#ifndef READCONF_MAX_KEYLEN
+# define READCONF_MAX_KEYLEN           60
 #endif
 
+#ifndef READCONF_MAX_SECNAME
+    # define READCONF_MAX_SECNAME      READCONF_MAX_KEYLEN
+#endif
 
-typedef struct _conf_position_t * CONF_position;
+typedef struct _conf_position_t* CONF_position;
+
+
+typedef struct {
+    int count;
+
+    char** keys;
+    char** values;
+
+    int* keylens;
+    int* valuelens;
+} ConfVariables;
+
 
 extern void* ConfMemAlloc (int numElems, int sizeElem);
 
@@ -85,9 +102,17 @@ extern void* ConfMemRealloc (void *oldBuffer, int oldSize, int newSize);
 
 extern void ConfMemFree (void *pBuffer);
 
-extern char* ConfMemCopyString (char **dst, const char *src);
+extern void ConfVariablesClear(ConfVariables* env);
+
+extern char** ConfStringArrayNew(int numElems);
+
+extern void ConfStringArrayFree(char** strs, int numElems);
+
+extern char* ConfMemCopyString(const char* src, size_t chlen);
 
 extern CONF_position ConfOpenFile (const char *conf);
+
+extern const char * ConfGetEncode (CONF_position cpos);
 
 extern void ConfCloseFile (CONF_position cpos);
 
@@ -99,11 +124,15 @@ extern const char *ConfGetSection (CONF_position cpos);
 
 extern READCONF_RESULT ConfCopySection (CONF_position cpos, char *secName);
 
+extern int ConfReadSectionVariables(const char* confFile, const char* sectionName, ConfVariables *outVars);
+
 extern int ConfReadValue (const char *confFile, const char *sectionName, const char *keyName, char *valbuf, size_t maxbufsize);
 
 extern int ConfReadValueRef (const char *confFile, const char *sectionName, const char *keyName, char **ppRefVal);
 
 extern int ConfReadValueParsed (const char *confFile, const char *family, const char *qualifier, const char *key, char *valbuf, size_t maxbufsize);
+
+extern int ConfReadValueParsed2(const char* confFile, const char* family, const char* qualifier, size_t qualifierlen, const char* key, char* valbuf, size_t maxbufsize);
 
 extern int ConfReadValueParsedAlloc (const char *confFile, const char *family, const char *qualifier, const char *key, char **value);
 

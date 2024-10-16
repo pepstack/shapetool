@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @file revise.sh
+# @file revise-source.sh
 #   revise source file version
 #
 # @author mapaware@hotmail.com
@@ -12,7 +12,7 @@
 #
 # usage:
 #
-#   $ revise.sh "/path/to/mycode.c"
+#   $ revise-source.sh "/path/to/mycode.c"
 #######################################################################
 _name_=$(basename "$0")
 _cdir_=$(cd "$(dirname "$0")" && pwd)

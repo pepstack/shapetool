@@ -1,39 +1,42 @@
-/***********************************************************************
- * Copyright (c) 2008-2080 pepstack.com, 350137278@qq.com
- *
- * ALL RIGHTS RESERVED.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- **********************************************************************/
-
+/******************************************************************************
+* Copyright © 2024-2035 Light Zhang <mapaware@hotmail.com>, MapAware, Inc.
+* ALL RIGHTS RESERVED.
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+******************************************************************************/
 /**
  * @file readconf.c
- *  read ini file api for Linux and Windows.
+ * @brief read ini file api for Linux and Windows.
  *
  * @author mapaware@hotmail.com
- * @version 0.0.1
+ * @copyright © 2024-2030 mapaware.top All Rights Reserved.
+ * @version 1.0.2
+ *
  * @since 2012-05-21 12:37:44
- * @date 2024-10-14 01:43:16
+ * @date 2024-10-17 03:53:04
+ *
+ * @note
+ *   The first file you should included.
  */
-#include "readconf.h"
 #include <math.h>
+
+#include "readconf.h"
 
 
 # if defined (_MSC_VER)
@@ -52,6 +55,7 @@
 typedef struct _conf_position_t
 {
     FILE *_fp;
+    char encode[16];
     char  _secname[READCONF_MAX_SECNAME + 4];
     char  _linebuf[READCONF_MAX_LINESIZE + 4];
 } conf_position_t;
@@ -155,6 +159,58 @@ NOWARNING_UNUSED(static) int splitpair (char *strbuf, char sep, char **key, char
 }
 
 
+NOWARNING_UNUSED(static)
+int StringReplaceNew(const char* original, const char* pattern, const char* replacement, char** outresult)
+{
+    size_t const replen = strlen(replacement);
+    size_t const patlen = strlen(pattern);
+    size_t const orilen = strlen(original);
+
+    size_t patcnt = 0;
+
+    const char* oriptr;
+    const char* patloc;
+
+    *outresult = 0;
+
+    // find how many times the pattern occurs in the original string
+    for ((oriptr = original); (patloc = strstr(oriptr, pattern)); (oriptr = patloc + patlen)) {
+        patcnt++;
+    }
+
+    if (patcnt) {
+        // allocate memory for the new string
+        size_t len = orilen + patcnt * (replen - patlen);
+
+        char* result = (char*) malloc(sizeof(char) * (len + 1));
+
+        // copy the original string,
+        // replacing all the instances of the pattern
+        char* retptr = result;
+
+        for ((oriptr = original); (patloc = strstr(oriptr, pattern)); (oriptr = patloc + patlen)) {
+            size_t const skplen = patloc - oriptr;
+
+            // copy the section until the occurence of the pattern
+            strncpy(retptr, oriptr, skplen);
+            retptr += skplen;
+
+            // copy the replacement
+            strncpy(retptr, replacement, replen);
+            retptr += replen;
+        }
+
+        // copy the rest of the string.
+        strcpy(retptr, oriptr);
+
+        *outresult = result;
+        return (int)len;
+    }
+
+    return 0;
+}
+
+
 NOWARNING_UNUSED(static) char** _SectionListAlloc (int numSections)
 {
     char **secs = (char**) ConfMemAlloc(numSections+1, sizeof(char*));
@@ -206,16 +262,54 @@ void ConfMemFree (void *pBuffer)
 }
 
 
-char * ConfMemCopyString (char **dst, const char *src)
+void ConfVariablesClear(ConfVariables* env)
 {
-    *dst = 0;
-
-    if (src) {
-        size_t cb = strlen(src) + 1;
-        *dst = (char*) malloc(cb);
-        memcpy(*dst, src, cb);
+    for (int i = 0; i < env->count; i++) {
+        ConfMemFree(env->keys[i]);
+        ConfMemFree(env->values[i]);
     }
-    return *dst;
+
+    ConfMemFree(env->values);
+    ConfMemFree(env->keys);
+    ConfMemFree(env->valuelens);
+    ConfMemFree(env->keylens);
+
+    memset(env, 0, sizeof(*env));
+}
+
+
+char ** ConfStringArrayNew(int numElems)
+{
+    char ** strs = (char **) malloc(sizeof(char *) * (numElems));
+    if (!strs) {
+        exit(READCONF_RET_OUTMEM);
+    }
+    while (numElems-- > 0) {
+        strs[numElems] = 0;
+    }
+    return strs;
+}
+
+
+void ConfStringArrayFree(char **strs, int numElems)
+{
+    while (numElems-- > 0) {
+        ConfMemFree(strs[numElems]);
+    }
+    ConfMemFree(strs);
+}
+
+
+char * ConfMemCopyString (const char *src, size_t chlen)
+{
+    if (src) {
+        char *buf;
+        int num = (int) (chlen == -1 ? strlen(src) : chlen);
+        buf = (char*) ConfMemAlloc(num + 1, sizeof(char));
+        memcpy(buf, src, num);
+        return buf;
+    }
+    return 0;
 }
 
 
@@ -227,8 +321,26 @@ CONF_position ConfOpenFile (const char *conf)
         return 0;
     }
     cpos = (CONF_position) ConfMemAlloc(1, sizeof(conf_position_t));
+
+    if (fgets(cpos->_linebuf, sizeof(cpos->_linebuf) - 1, fp) != 0) {
+        char* end = strrchr(cpos->_linebuf, ')');
+        if (end && !strncmp(cpos->_linebuf, "#!encode(", 9)) {
+            char* start = cpos->_linebuf + 8;
+            int blen = (int)(end - start);
+            if (blen > 0 && blen < (int) sizeof(cpos->encode)) {
+                strncpy(cpos->encode, ++start, blen-1);
+            }
+        }
+    }
+    rewind(fp);
     cpos->_fp = fp;
     return cpos;
+}
+
+
+const char* ConfGetEncode(CONF_position cpos)
+{
+    return cpos->encode;
 }
 
 
@@ -411,6 +523,102 @@ READCONF_BOOL ConfReadValueRef (const char *confFile, const char *sectionName, c
 }
 
 
+int ConfReadSectionVariables(const char* confFile, const char* sectionName, ConfVariables* outVars)
+{
+    char* str;
+    char* key;
+    char* val;
+
+    size_t count = 0;
+
+    memset(outVars, 0, sizeof(*outVars));
+
+    // 第一次获得元素数目
+    CONF_position cpos = ConfOpenFile(confFile);
+    str = ConfGetFirstPair(cpos, &key, &val);
+    while (str) {
+        if (! sectionName || ! strcmp(ConfGetSection(cpos), sectionName)) {
+            count++;
+        }
+        str = ConfGetNextPair(cpos, &key, &val);
+    }
+    ConfCloseFile(cpos);
+
+    if (! count) {
+        return 0;
+    }
+
+    // 第一次取得获得元素
+    int number = 0;
+
+    char keypattern[READCONF_MAX_KEYLEN + 4];
+
+    char **keys = ConfStringArrayNew((int)count);
+    char **values = ConfStringArrayNew((int)count);
+
+    int* keylens = ConfMemAlloc((int)count, sizeof(int));
+    int* valuelens = ConfMemAlloc((int)count, sizeof(int));
+
+    cpos = ConfOpenFile(confFile);
+    str = ConfGetFirstPair(cpos, &key, &val);
+    while (str) {
+        if (!sectionName || !strcmp(ConfGetSection(cpos), sectionName)) {
+            if (number < count) {
+                int kl = (int) strnlen(key, READCONF_MAX_KEYLEN + 1);
+                int vl = (int) strnlen(val, READCONF_MAX_LINESIZE);
+                if (kl != READCONF_MAX_KEYLEN + 1 && vl != READCONF_MAX_LINESIZE) {
+                    keys[number] = ConfMemCopyString(key, kl);
+                    values[number] = ConfMemCopyString(val, vl);
+                    keylens[number] = kl;
+                    valuelens[number] = vl;
+
+                    number++;
+                }
+            }
+        }
+        str = ConfGetNextPair(cpos, &key, &val);
+    }
+    ConfCloseFile(cpos);
+
+    if (number != count) {
+        // Unexpect: should never run to this.
+        ConfStringArrayFree(keys, number);
+        ConfStringArrayFree(values, number);
+        ConfMemFree(keylens);
+        ConfMemFree(valuelens);
+        return -1;
+    }
+
+    for (int i = 0; i < number; i++) {
+        snprintf(keypattern, sizeof(keypattern), "$(%.*s)", keylens[i], keys[i]);
+        char* replacement = values[i];
+
+        for (int j = 0; j < number; j++) {
+            if (i != j) {
+                // replace $(KEY) in values[j] with KEY's value
+                char* result = 0;
+                int reslen = StringReplaceNew(values[j], keypattern, replacement, &result);
+                if (reslen > 0) {
+                    ConfMemFree(values[j]);
+                    values[j] = ConfMemCopyString(result, reslen);
+                    valuelens[j] = reslen;
+                    free(result);
+                }
+            }
+        }
+    }
+
+    // set output
+    outVars->keys = keys;
+    outVars->keylens = keylens;
+    outVars->values = values;
+    outVars->valuelens = valuelens;
+    outVars->count = (int)count;
+
+    return (int) count;
+}
+
+
 int ConfReadValueParsed (const char *confFile, const char *family, const char *qualifier, const char *key, char *valbuf, size_t maxbufsize)
 {
     if (! qualifier) {
@@ -418,6 +626,20 @@ int ConfReadValueParsed (const char *confFile, const char *family, const char *q
     } else {
         char section[READCONF_MAX_SECNAME + 4];
         snprintf(section, sizeof(section), "%s:%s", family, qualifier);
+        return  ConfReadValue(confFile, section, key, valbuf, maxbufsize);
+    }
+}
+
+
+int ConfReadValueParsed2(const char* confFile, const char* family, const char* qualifier, size_t qualifierlen, const char* key, char* valbuf, size_t maxbufsize)
+{
+    if (!qualifier) {
+        return  ConfReadValue(confFile, family, key, valbuf, maxbufsize);
+    }
+    else {
+        int qlen = (int) (qualifierlen == -1 ? strnlen(qualifier, READCONF_MAX_KEYLEN) : qualifierlen);
+        char section[READCONF_MAX_SECNAME + READCONF_MAX_KEYLEN + 4];
+        snprintf(section, sizeof(section), "%s:%.*s", family, qlen, qualifier);
         return  ConfReadValue(confFile, section, key, valbuf, maxbufsize);
     }
 }

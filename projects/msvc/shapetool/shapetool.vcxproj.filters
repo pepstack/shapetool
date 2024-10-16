@@ -66,6 +66,15 @@
     <ClInclude Include="..\..\..\source\common\misc.h">
       <Filter>source\common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\source\common\readconf.h">
+      <Filter>source\common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\layerscfg.h">
+      <Filter>source</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\drawlayers.h">
+      <Filter>source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\drawshape.c">
@@ -89,12 +98,19 @@
     <ClCompile Include="..\..\..\source\common\win32\syslog-client.c">
       <Filter>source\common\win32</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\shapetoo-main.c">
+    <ClCompile Include="..\..\..\source\common\readconf.c">
+      <Filter>source\common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\shapetool-main.c">
+      <Filter>source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\drawlayers.c">
       <Filter>source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\README.md" />
     <None Include="..\..\..\CSS_polygon.md" />
+    <None Include="..\..\..\map-layers.cfg" />
   </ItemGroup>
 </Project>
